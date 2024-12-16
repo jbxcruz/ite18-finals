@@ -1,7 +1,6 @@
 
 
 
-
 let board;
 let boardWidth = 360;
 let boardHeight = 576;
@@ -38,7 +37,7 @@ let numStars = 100;
 let score = 0;
 let maxScore = 0;
 let gameOver = false;
-
+let highScore = 0; // Track high score
 let playerName = ''; // Store player's name
 
 window.onload = function () {
@@ -97,17 +96,17 @@ function update() {
     for (let i = 0; i < platformArray.length; i++) {
         let platform = platformArray[i];
         if (velocityY < 0 && doodler.y < boardHeight * 3 / 4) {
-            platform.y -= initialVelocityY; //slide platform down
+            platform.y -= initialVelocityY; // Slide platform down
         }
         if (detectCollision(doodler, platform) && velocityY >= 0) {
-            velocityY = initialVelocityY; //jump
+            velocityY = initialVelocityY; // Jump
         }
         context.drawImage(platform.img, platform.x, platform.y, platform.width, platform.height);
     }
 
     while (platformArray.length > 0 && platformArray[0].y >= boardHeight) {
-        platformArray.shift(); //removes first element from the array
-        newPlatform(); //replace with new platform on top
+        platformArray.shift(); // Removes first element from the array
+        newPlatform(); // Replace with new platform on top
     }
 
     // Update score and display it with player name
@@ -116,6 +115,9 @@ function update() {
     context.font = "16px sans-serif";
     context.fillText(`${playerName}'s Score: ${score}`, 5, 20);
 
+    // Display high score at the top-right corner
+    context.fillText(`High Score: ${highScore}`, boardWidth - 120, 20);
+
     if (gameOver) {
         context.fillText("Game Over: Press 'Space' to Restart", boardWidth / 7, boardHeight * 7 / 8);
         context.fillText(`Your final score is ${score}`, boardWidth / 4, boardHeight / 2);
@@ -123,14 +125,14 @@ function update() {
 }
 
 function moveDoodler(e) {
-    if (e.code == "ArrowRight" || e.code == "KeyD") { //move right
+    if (e.code == "ArrowRight" || e.code == "KeyD") { // Move right
         velocityX = 4;
         doodler.img = doodlerRightImg;
-    } else if (e.code == "ArrowLeft" || e.code == "KeyA") { //move left
+    } else if (e.code == "ArrowLeft" || e.code == "KeyA") { // Move left
         velocityX = -4;
         doodler.img = doodlerLeftImg;
     } else if (e.code == "Space" && gameOver) {
-        //reset
+        // Reset
         doodler = {
             img: doodlerRightImg,
             x: doodlerX,
@@ -198,13 +200,18 @@ function detectCollision(a, b) {
 
 function updateScore() {
     let points = Math.floor(50 * Math.random()); //(0-1) *50 --> (0-50)
-    if (velocityY < 0) { //negative going up
+    if (velocityY < 0) { // Negative velocity means the character is going up
         maxScore += points;
         if (score < maxScore) {
             score = maxScore;
         }
     } else if (velocityY >= 0) {
         maxScore -= points;
+    }
+
+    // Update high score if current score exceeds it
+    if (score > highScore) {
+        highScore = score;
     }
 }
 
