@@ -1,3 +1,6 @@
+
+
+
 let board;
 let boardWidth = 360;
 let boardHeight = 576;
@@ -95,7 +98,6 @@ function update() {
     }
     context.drawImage(doodler.img, doodler.x, doodler.y, doodler.width, doodler.height);
 
-    // Generate new platforms dynamically as the player moves up
     for (let i = 0; i < platformArray.length; i++) {
         let platform = platformArray[i];
 
@@ -128,14 +130,14 @@ function update() {
     updateScore();
     context.fillStyle = "black";
     context.font = "16px sans-serif";
-    context.fillText(`${playerName}'s Score: ${score}`, 5, 20);
+    context.fillText(${playerName}'s Score: ${score}, 5, 20);
 
     // Display high score at the top-right corner
-    context.fillText(`High Score: ${highScore}`, boardWidth - 120, 20);
+    context.fillText(High Score: ${highScore}, boardWidth - 120, 20);
 
     if (gameOver) {
         context.fillText("Game Over: Press 'Space' to Restart", boardWidth / 7, boardHeight * 7 / 8);
-        context.fillText(`Your final score is ${score}`, boardWidth / 4, boardHeight / 2);
+        context.fillText(Your final score is ${score}, boardWidth / 4, boardHeight / 2);
     }
 }
 
@@ -178,22 +180,35 @@ function placePlatforms() {
     };
     platformArray.push(platform);
 
-    // Generate platforms dynamically, randomizing platform type
     for (let i = 1; i <= 6; i++) {
-        newPlatform();
+        let randomX = Math.random() * (boardWidth - platformWidth); 
+        let randomY = boardHeight - i * 100; 
+
+        // 50% chance for the platform to be breakable
+        let isBreakable = Math.random() < 0.5; 
+
+        platform = {
+            img: isBreakable ? breakablePlatformImg : platformImg,  // Use breakable platform image if isBreakable is true
+            x: randomX,
+            y: randomY,
+            width: platformWidth,
+            height: platformHeight,
+            isBreakable: isBreakable
+        };
+
+        platformArray.push(platform);
     }
 }
 
 function newPlatform() {
     let randomX = Math.random() * (boardWidth - platformWidth); // Random X position
-    let isBreakable = Math.random() < 0.5; // 50% chance for breakable platform
     let platform = {
-        img: isBreakable ? breakablePlatformImg : platformImg,
+        img: platformImg,
         x: randomX,
         y: -platformHeight, 
         width: platformWidth,
         height: platformHeight,
-        isBreakable: isBreakable
+        isBreakable: false
     };
 
     platformArray.push(platform);
