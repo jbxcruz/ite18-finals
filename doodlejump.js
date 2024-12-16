@@ -22,15 +22,16 @@ let doodler = {
 };
 
 let velocityX = 0;
-let velocityY = 0; 
-let initialVelocityY = -8; 
-let gravity = 0.4;
+let velocityY = 0;
+let jumpVelocity = -8; // Initial upward velocity for jumping
+let bounceGravity = 0.3; // Reduced gravity when going up (to make the jump faster)
+let fallGravity = 0.6; // Increased gravity when falling (to make the fall slower)
 
 let platformArray = [];
 let platformWidth = 60;
 let platformHeight = 18;
 let platformImg;
-let breakingPlatformImg;
+let breakablePlatformImg;
 
 let stars = [];
 let numStars = 100;
@@ -47,7 +48,7 @@ window.onload = function () {
     board = document.getElementById("board");
     board.height = boardHeight;
     board.width = boardWidth;
-    context = board.getContext("2d"); 
+    context = board.getContext("2d");
 
     board.style.margin = "auto";
     board.style.display = "block";
@@ -63,11 +64,12 @@ window.onload = function () {
     doodlerLeftImg.src = "./doodler-left.png";
 
     platformImg = new Image();
-    platformImg.src = "./platform.png";
-    breakingPlatformImg = new Image(); // Image for the breaking platform
-    breakingPlatformImg.src = "./breaking-platform.png"; // Assume you have an image for it
+    platformImg.src = "./platform.png"; // Normal platform image
 
-    velocityY = initialVelocityY;
+    breakablePlatformImg = new Image();
+    breakablePlatformImg.src = "./breakable-platform.png"; // Image for breakable platform
+
+    velocityY = jumpVelocity;
     placePlatforms();
     generateStars();
     requestAnimationFrame(update);
@@ -90,7 +92,13 @@ function update() {
         doodler.x = boardWidth;
     }
 
-    velocityY += gravity;
+    // Apply gravity based on direction (bounceGravity when going up, fallGravity when falling)
+    if (velocityY < 0) {
+        velocityY += bounceGravity; // Upward movement gravity
+    } else {
+        velocityY += fallGravity; // Downward fall gravity
+    }
+
     doodler.y += velocityY;
     if (doodler.y > board.height) {
         gameOver = true;
@@ -100,19 +108,16 @@ function update() {
     for (let i = 0; i < platformArray.length; i++) {
         let platform = platformArray[i];
 
-        // If the platform is a breaking platform and the player steps on it, remove it
-        if (platform.isBreaking && detectCollision(doodler, platform) && velocityY >= 0) {
-            platformArray.splice(i, 1); // Remove the breaking platform from the array
-            velocityY = initialVelocityY; // Make the character jump or fall
-            i--; // Adjust the loop index after removal
+        if (velocityY < 0 && doodler.y < boardHeight * 3 / 4) {
+            platform.y -= jumpVelocity; // Slide platform down
         }
-
-        // For normal platforms or breaking platforms, we still check for collisions
-        if (detectCollision(doodler, platform) && velocityY >= 0 && !platform.isBreaking) {
-            velocityY = initialVelocityY; // Jump on regular platforms
+        if (detectCollision(doodler, platform) && velocityY >= 0) {
+            if (platform.isBreakable) {
+                platformArray.splice(i, 1); // Remove the breakable platform when stepped on
+            }
+            velocityY = jumpVelocity; // Jump
         }
-
-        // Draw the platform
+        // Draw platforms (Normal or breakable)
         context.drawImage(platform.img, platform.x, platform.y, platform.width, platform.height);
     }
 
@@ -123,7 +128,7 @@ function update() {
 
     // Update score and display it with player name
     updateScore();
-    context.fillStyle = "white";
+    context.fillStyle = "black";
     context.font = "16px sans-serif";
     context.fillText(`${playerName}'s Score: ${score}`, 5, 20);
 
@@ -154,7 +159,7 @@ function moveDoodler(e) {
         };
 
         velocityX = 0;
-        velocityY = initialVelocityY;
+        velocityY = jumpVelocity;
         score = 0;
         maxScore = 0;
         gameOver = false;
@@ -165,25 +170,13 @@ function moveDoodler(e) {
 function placePlatforms() {
     platformArray = [];
 
-    // Add some regular platforms
     let platform = {
         img: platformImg,
         x: boardWidth / 2 - platformWidth / 2,
         y: boardHeight - platformHeight - 10,
         width: platformWidth,
         height: platformHeight,
-        isBreaking: false
-    };
-    platformArray.push(platform);
-
-    // Add some breaking platforms
-    platform = {
-        img: breakingPlatformImg,
-        x: boardWidth / 2 - platformWidth / 2 + 100,
-        y: boardHeight - platformHeight - 100,
-        width: platformWidth,
-        height: platformHeight,
-        isBreaking: true // Mark this platform as breaking
+        isBreakable: false // Normal platform (not breakable)
     };
     platformArray.push(platform);
 
@@ -191,13 +184,15 @@ function placePlatforms() {
         let randomX = Math.random() * (boardWidth - platformWidth); 
         let randomY = boardHeight - i * 100; 
 
+        let isBreakable = Math.random() < 0.3; // 30% chance for a breakable platform
+
         platform = {
-            img: platformImg,
+            img: isBreakable ? breakablePlatformImg : platformImg, // Assign the breakable platform image
             x: randomX,
             y: randomY,
             width: platformWidth,
             height: platformHeight,
-            isBreaking: false
+            isBreakable: isBreakable // Mark as breakable if applicable
         };
 
         platformArray.push(platform);
@@ -206,13 +201,15 @@ function placePlatforms() {
 
 function newPlatform() {
     let randomX = Math.random() * (boardWidth - platformWidth); // Random X position
+    let isBreakable = Math.random() < 0.3; // 30% chance for a breakable platform
+
     let platform = {
-        img: platformImg,
+        img: isBreakable ? breakablePlatformImg : platformImg, // Random platform type
         x: randomX,
         y: -platformHeight, 
         width: platformWidth,
         height: platformHeight,
-        isBreaking: Math.random() < 0.3 // Randomly make 30% of platforms breakable
+        isBreakable: isBreakable // Mark as breakable if applicable
     };
 
     platformArray.push(platform);
@@ -260,7 +257,6 @@ function drawStars() {
         star.y += 0.5;
         if (star.y > boardHeight) {
             star.y = 0;
-            star.x = Math.random() * boardWidth;
         }
     }
 }
