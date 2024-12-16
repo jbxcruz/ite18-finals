@@ -67,7 +67,7 @@ window.onload = function () {
     platformImg.src = "./platform.png"; // Normal platform image
 
     breakablePlatformImg = new Image();
-    breakablePlatformImg.src = "./breakable-platform.png"; // Image for breakable platform
+    breakablePlatformImg.src = "./platform-broken.png"; // Image for breakable platform
 
     velocityY = jumpVelocity;
     placePlatforms();
@@ -184,7 +184,7 @@ function placePlatforms() {
         let randomX = Math.random() * (boardWidth - platformWidth); 
         let randomY = boardHeight - i * 100; 
 
-        let isBreakable = Math.random() < 0.3; // 30% chance for a breakable platform
+        let isBreakable = Math.random() < 0.2; // 20% chance for a breakable platform
 
         platform = {
             img: isBreakable ? breakablePlatformImg : platformImg, // Assign the breakable platform image
@@ -201,7 +201,7 @@ function placePlatforms() {
 
 function newPlatform() {
     let randomX = Math.random() * (boardWidth - platformWidth); // Random X position
-    let isBreakable = Math.random() < 0.3; // 30% chance for a breakable platform
+    let isBreakable = Math.random() < 0.2; // 20% chance for a breakable platform
 
     let platform = {
         img: isBreakable ? breakablePlatformImg : platformImg, // Random platform type
