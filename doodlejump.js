@@ -27,6 +27,7 @@ let platformArray = [];
 let platformWidth = 60;
 let platformHeight = 18;
 let platformImg;
+let platformBrokenImg; // For broken platform image
 
 let stars = [];
 let numStars = 100;
@@ -38,6 +39,8 @@ let gameOver = false;
 let shakeOffsetX = 0;
 let shakeOffsetY = 0;
 let shakeDuration = 0;
+
+let platformsPassed = 0; // For tracking platforms passed
 
 window.onload = function () {
     board = document.getElementById("board");
@@ -60,6 +63,9 @@ window.onload = function () {
 
     platformImg = new Image();
     platformImg.src = "./platform.png";
+    
+    platformBrokenImg = new Image(); // Load broken platform image
+    platformBrokenImg.src = "./platform-broken.png";
 
     velocityY = initialVelocityY;
     placePlatforms();
@@ -78,6 +84,7 @@ function update() {
 
     drawStars();
 
+    // Doodler Movement
     doodler.x += velocityX;
     if (doodler.x > boardWidth) {
         doodler.x = 0;
@@ -92,23 +99,35 @@ function update() {
     }
     context.drawImage(doodler.img, doodler.x, doodler.y, doodler.width, doodler.height);
 
+    // Handle Platforms
     for (let i = 0; i < platformArray.length; i++) {
         let platform = platformArray[i];
+
         if (velocityY < 0 && doodler.y < boardHeight * 3 / 4) {
-            platform.y -= initialVelocityY; //slide platform down
+            platform.y -= initialVelocityY; // Slide platform down
         }
+
         if (detectCollision(doodler, platform) && velocityY >= 0) {
-            velocityY = initialVelocityY; //jump
+            velocityY = initialVelocityY; // Jump when landing on platform
+
+            if (!platform.broken) {
+                platform.img = platformBrokenImg; // Set platform to broken image
+                platform.broken = true; // Mark platform as broken
+                platformsPassed++; // Count platform passed
+                score = platformsPassed * 10; // Increment score by 10 points per platform passed
+            }
         }
+
         context.drawImage(platform.img, platform.x, platform.y, platform.width, platform.height);
     }
 
+    // Remove platforms that are off-screen and create new ones
     while (platformArray.length > 0 && platformArray[0].y >= boardHeight) {
-        platformArray.shift(); //removes first element from the array
-        newPlatform(); //replace with new platform on top
+        platformArray.shift(); // Removes first element from the array
+        newPlatform(); // Replace with new platform on top
     }
 
-    //score
+    // Score display
     updateScore();
     context.fillStyle = "black";
     context.font = "16px sans-serif";
@@ -120,14 +139,14 @@ function update() {
 }
 
 function moveDoodler(e) {
-    if (e.code == "ArrowRight" || e.code == "KeyD") { //move right
+    if (e.code == "ArrowRight" || e.code == "KeyD") { // Move right
         velocityX = 4;
         doodler.img = doodlerRightImg;
-    } else if (e.code == "ArrowLeft" || e.code == "KeyA") { //move left
+    } else if (e.code == "ArrowLeft" || e.code == "KeyA") { // Move left
         velocityX = -4;
         doodler.img = doodlerLeftImg;
     } else if (e.code == "Space" && gameOver) {
-        //reset
+        // Reset game on Space key
         doodler = {
             img: doodlerRightImg,
             x: doodlerX,
@@ -139,7 +158,7 @@ function moveDoodler(e) {
         velocityX = 0;
         velocityY = initialVelocityY;
         score = 0;
-        maxScore = 0;
+        platformsPassed = 0;
         gameOver = false;
         placePlatforms();
     }
@@ -148,15 +167,18 @@ function moveDoodler(e) {
 function placePlatforms() {
     platformArray = [];
 
+    // Starting platform
     let platform = {
         img: platformImg,
         x: boardWidth / 2 - platformWidth / 2,
         y: boardHeight - platformHeight - 10,
         width: platformWidth,
-        height: platformHeight
+        height: platformHeight,
+        broken: false
     };
     platformArray.push(platform);
 
+    // Random platforms
     for (let i = 1; i <= 6; i++) {
         let randomX = Math.random() * (boardWidth - platformWidth); 
         let randomY = boardHeight - i * 100; 
@@ -166,7 +188,8 @@ function placePlatforms() {
             x: randomX,
             y: randomY,
             width: platformWidth,
-            height: platformHeight
+            height: platformHeight,
+            broken: false
         };
 
         platformArray.push(platform);
@@ -180,7 +203,8 @@ function newPlatform() {
         x: randomX,
         y: -platformHeight, 
         width: platformWidth,
-        height: platformHeight
+        height: platformHeight,
+        broken: false
     };
 
     platformArray.push(platform);
