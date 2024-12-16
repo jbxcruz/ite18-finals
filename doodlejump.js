@@ -136,7 +136,7 @@ function update() {
 
     // Update score and display it with player name
     updateScore();
-    context.fillStyle = "black";
+    context.fillStyle = "white";
     context.font = "16px sans-serif";
     context.fillText(`${playerName}'s Score: ${score}`, 5, 20);
 
@@ -180,7 +180,7 @@ function placePlatforms() {
 
     let platform = {
         img: platformImg,
-        x: boardWidth / 2 - platformWidth / 2,
+        x: boardWidth / 4 - platformWidth / 4,
         y: boardHeight - platformHeight - 10,
         width: platformWidth,
         height: platformHeight,
