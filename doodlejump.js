@@ -24,8 +24,10 @@ let doodler = {
 let velocityX = 0;
 let velocityY = 0;
 let jumpVelocity = -8;  // Initial upward velocity for jumping
-let bounceGravity = 0.3; // Reduced gravity when going up (to make the jump faster)
-let fallGravity = 0.6;   // Increased gravity when falling (to make the fall slower)
+let gravity = 0.4;      // Standard gravity for falling (used when no horizontal movement)
+let fallSpeed = 0;      // Fall speed increases gradually
+let maxFallSpeed = 8;   // Maximum fall speed when moving horizontally
+let fallAcceleration = 0.2; // Rate at which fall speed increases when moving horizontally
 
 let platformArray = [];
 let platformWidth = 60;
@@ -88,13 +90,22 @@ function update() {
         doodler.x = boardWidth;
     }
 
-    // Adjust gravity based on movement direction
+    // Adjust gravity and falling speed
     if (velocityY < 0) {
-        // When going up (jump), apply reduced gravity for bounciness
-        velocityY += bounceGravity;
+        // When going up (jump), apply regular gravity
+        velocityY += gravity;
     } else {
-        // When falling down, apply increased gravity
-        velocityY += fallGravity;
+        // When falling, gradually increase fall speed based on horizontal movement
+        if (velocityX !== 0) {
+            fallSpeed += fallAcceleration;
+            if (fallSpeed > maxFallSpeed) {
+                fallSpeed = maxFallSpeed;
+            }
+        } else {
+            // Reset fall speed to initial value when not moving horizontally
+            fallSpeed = 0;
+        }
+        velocityY += gravity + fallSpeed;
     }
 
     doodler.y += velocityY;
