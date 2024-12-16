@@ -1,6 +1,8 @@
 
 
 
+
+
 let board;
 let boardWidth = 360;
 let boardHeight = 576;
@@ -25,7 +27,7 @@ let velocityX = 0;
 let velocityY = 0; 
 let jumpVelocity = -6;  // Initial upward velocity for jumping
 let bounceGravity = 0.3; // Reduced gravity when going up (to make the jump faster)
-let fallGravity = 0.4;   // Increased gravity when falling (to make the fall slower)
+let fallGravity = 0.6;   // Increased gravity when falling (to make the fall slower)
 
 let platformArray = [];
 let platformWidth = 60;
@@ -91,19 +93,11 @@ function update() {
         doodler.x = boardWidth;
     }
 
-    // Adjust gravity depending on direction
-    if (velocityY < 0) {  // When jumping upwards
-        velocityY += bounceGravity; // Reduced gravity for jumping
-    } else {  // When falling downwards
-        velocityY += fallGravity; // Increased gravity for falling
-    }
-
+    velocityY += (velocityY < 0 ? bounceGravity : fallGravity); // Adjust gravity depending on direction
     doodler.y += velocityY;
-
     if (doodler.y > board.height) {
         gameOver = true;
     }
-    
     context.drawImage(doodler.img, doodler.x, doodler.y, doodler.width, doodler.height);
 
     for (let i = 0; i < platformArray.length; i++) {
@@ -136,16 +130,16 @@ function update() {
 
     // Update score and display it with player name
     updateScore();
-    context.fillStyle = "white";
+    context.fillStyle = "black";
     context.font = "16px sans-serif";
-    context.fillText(`${playerName}'s Score: ${score}`, 5, 20);
+    context.fillText(${playerName}'s Score: ${score}, 5, 20);
 
     // Display high score at the top-right corner
-    context.fillText(`High Score: ${highScore}`, boardWidth - 120, 20);
+    context.fillText(High Score: ${highScore}, boardWidth - 120, 20);
 
     if (gameOver) {
         context.fillText("Game Over: Press 'Space' to Restart", boardWidth / 7, boardHeight * 7 / 8);
-        context.fillText(`Your final score is ${score}`, boardWidth / 4, boardHeight / 2);
+        context.fillText(Your final score is ${score}, boardWidth / 4, boardHeight / 2);
     }
 }
 
@@ -188,7 +182,7 @@ function placePlatforms() {
     };
     platformArray.push(platform);
 
-    for (let i = 1; i <= 10; i++) {
+    for (let i = 1; i <= 6; i++) {
         let randomX = Math.random() * (boardWidth - platformWidth); 
         let randomY = boardHeight - i * 100; 
 
