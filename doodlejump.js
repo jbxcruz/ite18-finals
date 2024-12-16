@@ -1,6 +1,5 @@
 
 
-
 let board;
 let boardWidth = 360;
 let boardHeight = 576;
@@ -22,15 +21,14 @@ let doodler = {
 };
 
 let velocityX = 0;
-let velocityY = 0;
-let initialVelocityY = -8;
+let velocityY = 0; 
+let initialVelocityY = -8; 
 let gravity = 0.4;
 
 let platformArray = [];
 let platformWidth = 60;
 let platformHeight = 18;
 let platformImg;
-let brokenPlatformImg;
 
 let stars = [];
 let numStars = 100;
@@ -43,7 +41,7 @@ window.onload = function () {
     board = document.getElementById("board");
     board.height = boardHeight;
     board.width = boardWidth;
-    context = board.getContext("2d");
+    context = board.getContext("2d"); 
 
     board.style.margin = "auto";
     board.style.display = "block";
@@ -60,9 +58,6 @@ window.onload = function () {
 
     platformImg = new Image();
     platformImg.src = "./platform.png";
-
-    brokenPlatformImg = new Image();
-    brokenPlatformImg.src = "./platform-broken.png";
 
     velocityY = initialVelocityY;
     placePlatforms();
@@ -100,11 +95,7 @@ function update() {
             platform.y -= initialVelocityY; // slide platform down
         }
         if (detectCollision(doodler, platform) && velocityY >= 0) {
-            if (platform.type === "broken") {
-                continue; // Skip jump if platform is broken
-            } else {
-                velocityY = initialVelocityY; // jump
-            }
+            velocityY = initialVelocityY; // jump
         }
         context.drawImage(platform.img, platform.x, platform.y, platform.width, platform.height);
     }
@@ -114,11 +105,11 @@ function update() {
         newPlatform(); // replace with new platform on top
     }
 
-    // Update score
+    // Score
     updateScore();
     context.fillStyle = "black";
     context.font = "16px sans-serif";
-    context.fillText(score, 5, 20);
+    context.fillText(`Score: ${score}`, 5, 20);
 
     if (gameOver) {
         context.fillText("Game Over: Press 'Space' to Restart", boardWidth / 7, boardHeight * 7 / 8);
@@ -154,64 +145,56 @@ function moveDoodler(e) {
 function placePlatforms() {
     platformArray = [];
 
-    // Place initial platform
     let platform = {
         img: platformImg,
         x: boardWidth / 2 - platformWidth / 2,
         y: boardHeight - platformHeight - 10,
         width: platformWidth,
-        height: platformHeight,
-        type: "normal" // default normal platform
+        height: platformHeight
     };
     platformArray.push(platform);
 
-    // Add more platforms with random positions
     for (let i = 1; i <= 6; i++) {
-        newPlatform();
+        let randomX = Math.random() * (boardWidth - platformWidth); 
+        let randomY = boardHeight - i * 100; 
+
+        platform = {
+            img: platformImg,
+            x: randomX,
+            y: randomY,
+            width: platformWidth,
+            height: platformHeight
+        };
+
+        platformArray.push(platform);
     }
 }
 
 function newPlatform() {
     let randomX = Math.random() * (boardWidth - platformWidth); // Random X position
-    let platformType = "normal"; // Default platform type is normal
-
-    // Randomize platform type based on score
-    if (score >= 800) {
-        platformType = Math.random() < 0.5 ? "broken" : "normal"; // 50% chance for normal or broken
-    } else if (score >= 300) {
-        platformType = Math.random() < 0.4 ? "broken" : "normal"; // 60% normal, 40% broken
-    } else {
-        platformType = Math.random() < 0.2 ? "broken" : "normal"; // 80% normal, 20% broken
-    }
-
     let platform = {
-        img: platformType === "broken" ? brokenPlatformImg : platformImg, // Use broken image for broken platforms
+        img: platformImg,
         x: randomX,
-        y: -platformHeight, // Spawn above the board
+        y: -platformHeight, 
         width: platformWidth,
-        height: platformHeight,
-        type: platformType // Store the platform type (normal or broken)
+        height: platformHeight
     };
 
-    platformArray.push(platform); // Add the new platform to the array
+    platformArray.push(platform);
 }
 
 function detectCollision(a, b) {
-    return a.x < b.x + b.width &&
-        a.x + a.width > b.x &&
-        a.y < b.y + b.height &&
-        a.y + a.height > b.y;
+    return a.x < b.x + b.width &&   
+        a.x + a.width > b.x &&   
+        a.y < b.y + b.height &&  
+        a.y + a.height > b.y;    
 }
 
 function updateScore() {
-    let points = Math.floor(50 * Math.random()); //(0-1) *50 --> (0-50)
-    if (velocityY < 0) { // going up
-        maxScore += points;
-        if (score < maxScore) {
-            score = maxScore;
-        }
-    } else if (velocityY >= 0) {
-        maxScore -= points;
+    // Update score only if the player has reached a new height (max upward progress)
+    if (doodler.y < boardHeight * 3 / 4) {
+        maxScore = Math.max(maxScore, Math.floor(boardHeight * 3 / 4 - doodler.y));
+        score = maxScore; // The score represents the farthest upward distance
     }
 }
 
