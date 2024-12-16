@@ -1,6 +1,5 @@
 
 
-
 let board;
 let boardWidth = 360;
 let boardHeight = 576;
@@ -38,7 +37,6 @@ let numStars = 100;
 let score = 0;
 let maxScore = 0;
 let gameOver = false;
-let maxY = boardHeight; // To store the highest y-coordinate reached by the doodler
 
 window.onload = function () {
     board = document.getElementById("board");
@@ -114,7 +112,7 @@ function update() {
         newPlatform(); // replace with new platform on top
     }
 
-    // Update the score
+    // Score
     updateScore();
     context.fillStyle = "black";
     context.font = "16px sans-serif";
@@ -208,13 +206,11 @@ function detectCollision(a, b) {
 }
 
 function updateScore() {
-    // If the doodler is moving upwards (i.e., y decreases), update the maxY
-    if (doodler.y < maxY) {
-        maxY = doodler.y; // Update the highest point reached
+    // Update score only if the player has reached a new height (max upward progress)
+    if (doodler.y < boardHeight * 3 / 4) {
+        maxScore = Math.max(maxScore, Math.floor(boardHeight * 3 / 4 - doodler.y));
+        score = maxScore; // The score represents the farthest upward distance
     }
-
-    // The score is based on how far the doodler is from the bottom of the screen
-    score = Math.max(0, Math.floor(boardHeight - maxY)); // Score should not go negative
 }
 
 function generateStars() {
