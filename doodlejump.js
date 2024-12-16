@@ -31,6 +31,9 @@ let platformWidth = 60;
 let platformHeight = 18;
 let platformImg;
 
+let breakablePlatformImg = new Image(); // Declare a new image for breakable platforms
+breakablePlatformImg.src = './breakable-platform.png'; // Use your image URL here
+
 let stars = [];
 let numStars = 100;
 
@@ -161,12 +164,12 @@ function placePlatforms() {
         let isBreakable = Math.random() < 0.2; // 20% chance for a breakable platform
 
         let platform = {
-            img: platformImg,
+            img: isBreakable ? breakablePlatformImg : platformImg, // Use the breakable platform image if it's breakable
             x: randomX,
             y: randomY,
             width: platformWidth,
             height: platformHeight,
-            isBreakable: isBreakable // Add this to track if the platform is breakable
+            isBreakable: isBreakable
         };
         platformArray.push(platform);
     }
