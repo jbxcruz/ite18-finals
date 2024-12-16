@@ -89,24 +89,24 @@ function update() {
     }
     context.drawImage(doodler.img, doodler.x, doodler.y, doodler.width, doodler.height);
 
-    for (let i = 0; i < platformArray.length; i++) {
-        let platform = platformArray[i];
-        if (velocityY < 0 && doodler.y < boardHeight * 3 / 4) {
-            platform.y -= initialVelocityY; // slide platform down
-        }
-        
-     if (
-    velocityY > 0 && // Ensure doodler is falling
-    doodler.y + doodler.height >= platform.y && // Bottom of doodler reaches or passes platform's top
-    doodler.y + doodler.height <= platform.y + 10 && // Allow small buffer for landing detection
-    doodler.x + doodler.width > platform.x && // Horizontal overlap
-    doodler.x < platform.x + platform.width
-) {
-    velocityY = initialVelocityY; // Reset vertical velocity for consistent bounce
+for (let i = 0; i < platformArray.length; i++) {
+    let platform = platformArray[i];
+    if (velocityY < 0 && doodler.y < boardHeight * 3 / 4) {
+        platform.y -= Math.abs(initialVelocityY); // Slide platforms smoothly
+    }
+    if (
+        velocityY > 0 && // Doodler is falling
+        doodler.y + doodler.height >= platform.y && // Bottom of doodler reaches platform's top
+        doodler.y + doodler.height - velocityY <= platform.y && // Ensure landing detection
+        doodler.x + doodler.width > platform.x && // Horizontal overlap
+        doodler.x < platform.x + platform.width
+    ) {
+        velocityY = initialVelocityY; // Reset upward velocity for consistent bounce
+        doodler.y = platform.y - doodler.height; // Align doodler to platform
+    }
+    context.drawImage(platform.img, platform.x, platform.y, platform.width, platform.height);
 }
 
-        context.drawImage(platform.img, platform.x, platform.y, platform.width, platform.height);
-    }
 
     while (platformArray.length > 0 && platformArray[0].y >= boardHeight) {
         platformArray.shift(); // removes first element from the array
