@@ -22,8 +22,8 @@ let doodler = {
 
 let velocityX = 0;
 let velocityY = 0; 
-let initialVelocityY = -6; 
-let gravity = 0.4;
+let initialVelocityY = -7; 
+let gravity = 0.7;
 
 let platformArray = [];
 let platformWidth = 60;
