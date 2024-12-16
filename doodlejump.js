@@ -5,6 +5,7 @@ let boardWidth = 360;
 let boardHeight = 576;
 let context;
 
+
 let doodlerWidth = 46;
 let doodlerHeight = 46;
 let doodlerX = boardWidth / 2 - doodlerWidth / 2;
@@ -20,16 +21,18 @@ let doodler = {
     height: doodlerHeight
 };
 
+
 let velocityX = 0;
-let velocityY = 0;
-let initialVelocityY = -8;
+let velocityY = 0; 
+let initialVelocityY = -8; 
 let gravity = 0.4;
+
 
 let platformArray = [];
 let platformWidth = 60;
 let platformHeight = 18;
 let platformImg;
-let brokenPlatformImg;
+
 
 let stars = [];
 let numStars = 100;
@@ -42,10 +45,12 @@ window.onload = function () {
     board = document.getElementById("board");
     board.height = boardHeight;
     board.width = boardWidth;
-    context = board.getContext("2d");
+    context = board.getContext("2d"); 
 
+ 
     board.style.margin = "auto";
     board.style.display = "block";
+
 
     doodlerRightImg = new Image();
     doodlerRightImg.src = "./doodler-right.png";
@@ -59,9 +64,6 @@ window.onload = function () {
 
     platformImg = new Image();
     platformImg.src = "./platform.png";
-
-    brokenPlatformImg = new Image();
-    brokenPlatformImg.src = "./platform-broken.png"; // The broken platform image
 
     velocityY = initialVelocityY;
     placePlatforms();
@@ -77,8 +79,10 @@ function update() {
     }
     context.clearRect(0, 0, board.width, board.height);
 
+   
     drawStars();
 
+    
     doodler.x += velocityX;
     if (doodler.x > boardWidth) {
         doodler.x = 0;
@@ -93,30 +97,29 @@ function update() {
     }
     context.drawImage(doodler.img, doodler.x, doodler.y, doodler.width, doodler.height);
 
+    
     for (let i = 0; i < platformArray.length; i++) {
         let platform = platformArray[i];
         if (velocityY < 0 && doodler.y < boardHeight * 3 / 4) {
-            platform.y -= initialVelocityY; // slide platform down
+            platform.y -= initialVelocityY; //slide platform down
         }
         if (detectCollision(doodler, platform) && velocityY >= 0) {
-            velocityY = initialVelocityY; // jump
-            if (platform.isBroken) {
-                platformArray.splice(i, 1); // Remove the broken platform after landing on it
-            }
+            velocityY = initialVelocityY; //jump
         }
         context.drawImage(platform.img, platform.x, platform.y, platform.width, platform.height);
     }
 
+    
     while (platformArray.length > 0 && platformArray[0].y >= boardHeight) {
-        platformArray.shift(); // removes first element from the array
-        newPlatform(); // replace with new platform on top
+        platformArray.shift(); //removes first element from the array
+        newPlatform(); //replace with new platform on top
     }
 
-    // Score
+    //score
     updateScore();
     context.fillStyle = "black";
     context.font = "16px sans-serif";
-    context.fillText(Score: ${score}, 5, 20);
+    context.fillText(score, 5, 20);
 
     if (gameOver) {
         context.fillText("Game Over: Press 'Space' to Restart", boardWidth / 7, boardHeight * 7 / 8);
@@ -124,14 +127,14 @@ function update() {
 }
 
 function moveDoodler(e) {
-    if (e.code == "ArrowRight" || e.code == "KeyD") { // move right
+    if (e.code == "ArrowRight" || e.code == "KeyD") { //move right
         velocityX = 4;
         doodler.img = doodlerRightImg;
-    } else if (e.code == "ArrowLeft" || e.code == "KeyA") { // move left
+    } else if (e.code == "ArrowLeft" || e.code == "KeyA") { //move left
         velocityX = -4;
         doodler.img = doodlerLeftImg;
     } else if (e.code == "Space" && gameOver) {
-        // reset
+        //reset
         doodler = {
             img: doodlerRightImg,
             x: doodlerX,
@@ -152,30 +155,27 @@ function moveDoodler(e) {
 function placePlatforms() {
     platformArray = [];
 
+   
     let platform = {
         img: platformImg,
         x: boardWidth / 2 - platformWidth / 2,
         y: boardHeight - platformHeight - 10,
         width: platformWidth,
-        height: platformHeight,
-        isBroken: false
+        height: platformHeight
     };
     platformArray.push(platform);
 
+    
     for (let i = 1; i <= 6; i++) {
         let randomX = Math.random() * (boardWidth - platformWidth); 
         let randomY = boardHeight - i * 100; 
 
-        // Randomly decide if the platform should be broken
-        let isBroken = Math.random() < 0.2; // 20% chance to be a broken platform
-
         platform = {
-            img: isBroken ? brokenPlatformImg : platformImg, // Use broken platform image if isBroken is true
+            img: platformImg,
             x: randomX,
             y: randomY,
             width: platformWidth,
-            height: platformHeight,
-            isBroken: isBroken // Store whether the platform is broken
+            height: platformHeight
         };
 
         platformArray.push(platform);
@@ -184,15 +184,12 @@ function placePlatforms() {
 
 function newPlatform() {
     let randomX = Math.random() * (boardWidth - platformWidth); // Random X position
-    let isBroken = Math.random() < 0.2; // 20% chance to be a broken platform
-
     let platform = {
-        img: isBroken ? brokenPlatformImg : platformImg, // Use broken platform image if isBroken is true
+        img: platformImg,
         x: randomX,
         y: -platformHeight, 
         width: platformWidth,
-        height: platformHeight,
-        isBroken: isBroken // Store whether the platform is broken
+        height: platformHeight
     };
 
     platformArray.push(platform);
@@ -206,12 +203,17 @@ function detectCollision(a, b) {
 }
 
 function updateScore() {
-    // Update score only if the player has reached a new height (max upward progress)
-    if (doodler.y < boardHeight * 3 / 4) {
-        maxScore = Math.max(maxScore, Math.floor(boardHeight * 3 / 4 - doodler.y));
-        score = maxScore; // The score represents the farthest upward distance
+    let points = Math.floor(50 * Math.random()); //(0-1) *50 --> (0-50)
+    if (velocityY < 0) { //negative going up
+        maxScore += points;
+        if (score < maxScore) {
+            score = maxScore;
+        }
+    } else if (velocityY >= 0) {
+        maxScore -= points;
     }
 }
+
 
 function generateStars() {
     for (let i = 0; i < numStars; i++) {
@@ -230,6 +232,7 @@ function drawStars() {
         context.arc(star.x, star.y, star.radius, 0, 2 * Math.PI);
         context.fill();
 
+       
         star.y += 0.5;
         if (star.y > boardHeight) {
             star.y = 0;
@@ -237,3 +240,7 @@ function drawStars() {
         }
     }
 }
+
+
+
+
