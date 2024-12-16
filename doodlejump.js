@@ -22,7 +22,7 @@ let doodler = {
 
 let velocityX = 0;
 let velocityY = 0; 
-let initialVelocityY = -6; 
+let initialVelocityY = -8; 
 let gravity = 0.4;
 
 let platformArray = [];
@@ -89,24 +89,23 @@ function update() {
     }
     context.drawImage(doodler.img, doodler.x, doodler.y, doodler.width, doodler.height);
 
-for (let i = 0; i < platformArray.length; i++) {
-    let platform = platformArray[i];
-    if (velocityY < 0 && doodler.y < boardHeight * 3 / 4) {
-        platform.y -= Math.abs(initialVelocityY); // Slide platforms smoothly
-    }
-    if (
-        velocityY > 0 && // Doodler is falling
-        doodler.y + doodler.height >= platform.y && // Bottom of doodler reaches platform's top
-        doodler.y + doodler.height - velocityY <= platform.y && // Ensure landing detection
-        doodler.x + doodler.width > platform.x && // Horizontal overlap
-        doodler.x < platform.x + platform.width
-    ) {
-        velocityY = initialVelocityY; // Reset upward velocity for consistent bounce
-        doodler.y = platform.y - doodler.height; // Align doodler to platform
-    }
-    context.drawImage(platform.img, platform.x, platform.y, platform.width, platform.height);
+    for (let i = 0; i < platformArray.length; i++) {
+        let platform = platformArray[i];
+        if (velocityY < 0 && doodler.y < boardHeight * 3 / 4) {
+            platform.y -= initialVelocityY; // slide platform down
+        }
+       if (
+    velocityY > 0 && // Ensure doodler is falling
+    doodler.y + doodler.height <= platform.y + 10 && // Bottom of doodler is near the top of platform
+    doodler.y + doodler.height >= platform.y && // Doodler has just landed on the platform
+    doodler.x + doodler.width > platform.x && // Doodler's right edge is past the platform's left edge
+    doodler.x < platform.x + platform.width // Doodler's left edge is before the platform's right edge
+) {
+    velocityY = initialVelocityY; // Jump after landing
 }
 
+        context.drawImage(platform.img, platform.x, platform.y, platform.width, platform.height);
+    }
 
     while (platformArray.length > 0 && platformArray[0].y >= boardHeight) {
         platformArray.shift(); // removes first element from the array
@@ -205,7 +204,6 @@ function updateScore() {
         score = maxScore; // The score represents the farthest upward distance
     }
 }
-
 
 function generateStars() {
     for (let i = 0; i < numStars; i++) {
