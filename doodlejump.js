@@ -65,7 +65,7 @@ window.onload = function () {
     platformImg = new Image();
     platformImg.src = "./platform.png";
     breakingPlatformImg = new Image(); // Image for the breaking platform
-    breakingPlatformImg.src = "./breaking-platform.png"; // Assume you have an image for it
+    breakingPlatformImg.src = "./platform-broken.png"; // Assume you have an image for it
 
     velocityY = initialVelocityY;
     placePlatforms();
