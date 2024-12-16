@@ -23,7 +23,7 @@ let doodler = {
 let velocityX = 0;
 let velocityY = 0;
 let jumpVelocity = -8;  // Initial upward velocity for jumping
-let bounceGravity = 0.4; // Reduced gravity when going up (to make the jump faster)
+let bounceGravity = 0.6; // Reduced gravity when going up (to make the jump faster)
 let fallGravity = 0.8;   // Increased gravity when falling (to make the fall slower)
 
 let platformArray = [];
