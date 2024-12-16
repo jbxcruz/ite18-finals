@@ -183,8 +183,8 @@ function placePlatforms() {
         let randomX = Math.random() * (boardWidth - platformWidth); 
         let randomY = boardHeight - i * 100; 
 
-        // 30% chance for the platform to be breakable
-        let isBreakable = Math.random() < 0.3; 
+        // 50% chance for the platform to be breakable
+        let isBreakable = Math.random() < 0.5; 
 
         platform = {
             img: isBreakable ? breakablePlatformImg : platformImg,  // Use breakable platform image if isBreakable is true
