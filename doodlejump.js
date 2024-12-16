@@ -207,12 +207,13 @@ function detectCollision(a, b) {
 }
 
 function updateScore() {
-    // Update score only if the player has reached a new height (max upward progress)
-    if (doodler.y < boardHeight * 3 / 4) {
-        maxScore = Math.max(maxScore, Math.floor(boardHeight * 3 / 4 - doodler.y));
-        score = maxScore; // The score represents the farthest upward distance
+    // Update score based on the highest Y position the player has reached
+    if (doodler.y < maxScore || maxScore === 0) {
+        maxScore = doodler.y; // Keep track of the highest point the player has reached
+        score = Math.floor(maxScore / 10); // Convert the max Y position into a score
     }
 }
+
 
 function generateStars() {
     for (let i = 0; i < numStars; i++) {
