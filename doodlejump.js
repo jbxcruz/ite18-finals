@@ -94,15 +94,17 @@ function update() {
         if (velocityY < 0 && doodler.y < boardHeight * 3 / 4) {
             platform.y -= initialVelocityY; // slide platform down
         }
-        if (
+        
+     if (
     velocityY > 0 && // Ensure doodler is falling
-    doodler.y + doodler.height <= platform.y + 10 && // Bottom of doodler is near the top of platform
-    doodler.y + doodler.height >= platform.y && // Doodler has just landed on the platform
-    doodler.x + doodler.width > platform.x && // Doodler's right edge is past the platform's left edge
-    doodler.x < platform.x + platform.width // Doodler's left edge is before the platform's right edge
+    doodler.y + doodler.height >= platform.y && // Bottom of doodler reaches or passes platform's top
+    doodler.y + doodler.height <= platform.y + 10 && // Allow small buffer for landing detection
+    doodler.x + doodler.width > platform.x && // Horizontal overlap
+    doodler.x < platform.x + platform.width
 ) {
-    velocityY = initialVelocityY; // Jump after landing
+    velocityY = initialVelocityY; // Reset vertical velocity for consistent bounce
 }
+
         context.drawImage(platform.img, platform.x, platform.y, platform.width, platform.height);
     }
 
