@@ -153,48 +153,35 @@ function moveDoodler(e) {
 function placePlatforms() {
     platformArray = [];
 
-    let platform = {
-        img: platformImg,
-        x: boardWidth / 2 - platformWidth / 2,
-        y: boardHeight - platformHeight - 10,
-        width: platformWidth,
-        height: platformHeight,
-        type: "normal" // Default platform type is normal
-    };
-    platformArray.push(platform);
-
     for (let i = 1; i <= 6; i++) {
-        newPlatform(); // Use the updated newPlatform function to create platforms
+        newPlatform(); // Create platforms with randomized properties
     }
 }
 
 function newPlatform() {
     let randomX = Math.random() * (boardWidth - platformWidth); // Random X position
+    let randomY = Math.random() * 200 + 50; // Random Y position, ensuring they start from 50px above the bottom
 
-    // Determine platform probability based on current score
-    let platformType = "normal"; // Default is normal platform
+    // Determine platform type based on score
+    let platformType = "normal"; // Default platform type is normal
     if (score >= 800) {
-        // 50% chance for normal, 50% chance for broken
-        platformType = Math.random() < 0.5 ? "broken" : "normal";
+        platformType = Math.random() < 0.5 ? "broken" : "normal"; // 50% chance for normal or broken
     } else if (score >= 300) {
-        // 60% chance for normal, 40% chance for broken
-        platformType = Math.random() < 0.4 ? "broken" : "normal";
+        platformType = Math.random() < 0.4 ? "broken" : "normal"; // 60% normal, 40% broken
     } else {
-        // 80% chance for normal, 20% chance for broken
-        platformType = Math.random() < 0.2 ? "broken" : "normal";
+        platformType = Math.random() < 0.2 ? "broken" : "normal"; // 80% normal, 20% broken
     }
 
-    // Create platform with selected type
     let platform = {
-        img: platformType === "broken" ? brokenPlatformImg : platformImg, // Assign image based on platform type
+        img: platformType === "broken" ? brokenPlatformImg : platformImg, // Use broken image for broken platforms
         x: randomX,
-        y: -platformHeight, // Start off-screen
+        y: randomY,
         width: platformWidth,
         height: platformHeight,
-        type: platformType // Store platform type (normal or broken)
+        type: platformType // Store the platform type (normal or broken)
     };
 
-    platformArray.push(platform); // Add platform to array
+    platformArray.push(platform); // Add new platform to array
 }
 
 function detectCollision(a, b) {
