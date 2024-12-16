@@ -23,15 +23,13 @@ let doodler = {
 
 let velocityX = 0;
 let velocityY = 0;
-let jumpVelocity = -8; // Initial upward velocity for jumping
-let bounceGravity = 0.3; // Reduced gravity when going up (to make the jump faster)
-let fallGravity = 0.6; // Increased gravity when falling (to make the fall slower)
+let initialVelocityY = -8;
+let gravity = 0.4;
 
 let platformArray = [];
 let platformWidth = 60;
 let platformHeight = 18;
 let platformImg;
-let breakablePlatformImg;
 
 let stars = [];
 let numStars = 100;
@@ -39,12 +37,8 @@ let numStars = 100;
 let score = 0;
 let maxScore = 0;
 let gameOver = false;
-let highScore = 0; // Track high score
-let playerName = ''; // Store player's name
-let lastYPosition = doodlerY; // Track the last Y position to detect upward movement
 
 window.onload = function () {
-    playerName = prompt("Enter your name:"); // Ask for the player's name
     board = document.getElementById("board");
     board.height = boardHeight;
     board.width = boardWidth;
@@ -64,12 +58,9 @@ window.onload = function () {
     doodlerLeftImg.src = "./doodler-left.png";
 
     platformImg = new Image();
-    platformImg.src = "./platform.png"; // Normal platform image
+    platformImg.src = "./platform.png";
 
-    breakablePlatformImg = new Image();
-    breakablePlatformImg.src = "./platform-broken.png"; // Image for breakable platform
-
-    velocityY = jumpVelocity;
+    velocityY = initialVelocityY;
     placePlatforms();
     generateStars();
     requestAnimationFrame(update);
@@ -92,13 +83,7 @@ function update() {
         doodler.x = boardWidth;
     }
 
-    // Apply gravity based on direction (bounceGravity when going up, fallGravity when falling)
-    if (velocityY < 0) {
-        velocityY += bounceGravity; // Upward movement gravity
-    } else {
-        velocityY += fallGravity; // Downward fall gravity
-    }
-
+    velocityY += gravity;
     doodler.y += velocityY;
     if (doodler.y > board.height) {
         gameOver = true;
@@ -108,48 +93,47 @@ function update() {
     for (let i = 0; i < platformArray.length; i++) {
         let platform = platformArray[i];
 
-        if (velocityY < 0 && doodler.y < boardHeight * 3 / 4) {
-            platform.y -= jumpVelocity; // Slide platform down
-        }
+        // Detect if the player is on a breakable platform
         if (detectCollision(doodler, platform) && velocityY >= 0) {
             if (platform.isBreakable) {
-                platformArray.splice(i, 1); // Remove the breakable platform when stepped on
+                // Remove the platform (make it disappear)
+                platformArray.splice(i, 1);
+                i--; // Adjust index because the array is modified
+                velocityY = initialVelocityY; // Reset upward velocity to simulate jumping again
+            } else {
+                // If it's not a breakable platform, simulate the jump
+                velocityY = initialVelocityY;
             }
-            velocityY = jumpVelocity; // Jump
         }
-        // Draw platforms (Normal or breakable)
+
+        // Draw the platform
         context.drawImage(platform.img, platform.x, platform.y, platform.width, platform.height);
     }
 
+    // Remove off-screen platforms
     while (platformArray.length > 0 && platformArray[0].y >= boardHeight) {
-        platformArray.shift(); // Removes first element from the array
-        newPlatform(); // Replace with new platform on top
+        platformArray.shift();
+        newPlatform();
     }
 
-    // Update score and display it with player name
     updateScore();
     context.fillStyle = "black";
     context.font = "16px sans-serif";
-    context.fillText(`${playerName}'s Score: ${score}`, 5, 20);
-
-    // Display high score at the top-right corner
-    context.fillText(`High Score: ${highScore}`, boardWidth - 120, 20);
+    context.fillText(score, 5, 20);
 
     if (gameOver) {
         context.fillText("Game Over: Press 'Space' to Restart", boardWidth / 7, boardHeight * 7 / 8);
-        context.fillText(`Your final score is ${score}`, boardWidth / 4, boardHeight / 2);
     }
 }
 
 function moveDoodler(e) {
-    if (e.code == "ArrowRight" || e.code == "KeyD") { // Move right
+    if (e.code == "ArrowRight" || e.code == "KeyD") {
         velocityX = 4;
         doodler.img = doodlerRightImg;
-    } else if (e.code == "ArrowLeft" || e.code == "KeyA") { // Move left
+    } else if (e.code == "ArrowLeft" || e.code == "KeyA") {
         velocityX = -4;
         doodler.img = doodlerLeftImg;
     } else if (e.code == "Space" && gameOver) {
-        // Reset
         doodler = {
             img: doodlerRightImg,
             x: doodlerX,
@@ -159,7 +143,7 @@ function moveDoodler(e) {
         };
 
         velocityX = 0;
-        velocityY = jumpVelocity;
+        velocityY = initialVelocityY;
         score = 0;
         maxScore = 0;
         gameOver = false;
@@ -170,71 +154,55 @@ function moveDoodler(e) {
 function placePlatforms() {
     platformArray = [];
 
-    let platform = {
-        img: platformImg,
-        x: boardWidth / 2 - platformWidth / 2,
-        y: boardHeight - platformHeight - 10,
-        width: platformWidth,
-        height: platformHeight,
-        isBreakable: false // Normal platform (not breakable)
-    };
-    platformArray.push(platform);
-
     for (let i = 1; i <= 6; i++) {
-        let randomX = Math.random() * (boardWidth - platformWidth); 
-        let randomY = boardHeight - i * 100; 
+        let randomX = Math.random() * (boardWidth - platformWidth);
+        let randomY = boardHeight - i * 100;
 
         let isBreakable = Math.random() < 0.2; // 20% chance for a breakable platform
 
-        platform = {
-            img: isBreakable ? breakablePlatformImg : platformImg, // Assign the breakable platform image
+        let platform = {
+            img: platformImg,
             x: randomX,
             y: randomY,
             width: platformWidth,
             height: platformHeight,
-            isBreakable: isBreakable // Mark as breakable if applicable
+            isBreakable: isBreakable // Add this to track if the platform is breakable
         };
-
         platformArray.push(platform);
     }
 }
 
 function newPlatform() {
-    let randomX = Math.random() * (boardWidth - platformWidth); // Random X position
-    let isBreakable = Math.random() < 0.2; // 20% chance for a breakable platform
-
+    let randomX = Math.random() * (boardWidth - platformWidth);
     let platform = {
-        img: isBreakable ? breakablePlatformImg : platformImg, // Random platform type
+        img: platformImg,
         x: randomX,
-        y: -platformHeight, 
+        y: -platformHeight,
         width: platformWidth,
         height: platformHeight,
-        isBreakable: isBreakable // Mark as breakable if applicable
+        isBreakable: Math.random() < 0.2 // 20% chance for a breakable platform
     };
 
     platformArray.push(platform);
 }
 
 function detectCollision(a, b) {
-    return a.x < b.x + b.width &&   
-        a.x + a.width > b.x &&   
-        a.y < b.y + b.height &&  
-        a.y + a.height > b.y;    
+    return a.x < b.x + b.width &&
+        a.x + a.width > b.x &&
+        a.y < b.y + b.height &&
+        a.y + a.height > b.y;
 }
 
 function updateScore() {
-    // Increase the score when the player is going upwards
-    if (doodler.y < lastYPosition) {
-        score += 1; // Increment the score as the player goes up
-        maxScore = score > maxScore ? score : maxScore; // Track max score during the game session
+    let points = Math.floor(50 * Math.random());
+    if (velocityY < 0) {
+        maxScore += points;
+        if (score < maxScore) {
+            score = maxScore;
+        }
+    } else if (velocityY >= 0) {
+        maxScore -= points;
     }
-
-    // Update high score if current score exceeds it
-    if (score > highScore) {
-        highScore = score;
-    }
-
-    lastYPosition = doodler.y; // Update last Y position for the next frame
 }
 
 function generateStars() {
@@ -253,10 +221,5 @@ function drawStars() {
         context.beginPath();
         context.arc(star.x, star.y, star.radius, 0, 2 * Math.PI);
         context.fill();
-
-        star.y += 0.5;
-        if (star.y > boardHeight) {
-            star.y = 0;
-        }
     }
 }
