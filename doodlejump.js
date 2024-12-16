@@ -1,5 +1,6 @@
 
 
+
 let board;
 let boardWidth = 360;
 let boardHeight = 576;
@@ -21,14 +22,15 @@ let doodler = {
 };
 
 let velocityX = 0;
-let velocityY = 0; 
-let initialVelocityY = -8; 
+let velocityY = 0;
+let initialVelocityY = -8;
 let gravity = 0.4;
 
 let platformArray = [];
 let platformWidth = 60;
 let platformHeight = 18;
 let platformImg;
+let brokenPlatformImg;
 
 let stars = [];
 let numStars = 100;
@@ -41,7 +43,7 @@ window.onload = function () {
     board = document.getElementById("board");
     board.height = boardHeight;
     board.width = boardWidth;
-    context = board.getContext("2d"); 
+    context = board.getContext("2d");
 
     board.style.margin = "auto";
     board.style.display = "block";
@@ -58,6 +60,9 @@ window.onload = function () {
 
     platformImg = new Image();
     platformImg.src = "./platform.png";
+
+    brokenPlatformImg = new Image();
+    brokenPlatformImg.src = "./platform-broken.png"; // The broken platform image
 
     velocityY = initialVelocityY;
     placePlatforms();
@@ -96,6 +101,9 @@ function update() {
         }
         if (detectCollision(doodler, platform) && velocityY >= 0) {
             velocityY = initialVelocityY; // jump
+            if (platform.isBroken) {
+                platformArray.splice(i, 1); // Remove the broken platform after landing on it
+            }
         }
         context.drawImage(platform.img, platform.x, platform.y, platform.width, platform.height);
     }
@@ -150,7 +158,8 @@ function placePlatforms() {
         x: boardWidth / 2 - platformWidth / 2,
         y: boardHeight - platformHeight - 10,
         width: platformWidth,
-        height: platformHeight
+        height: platformHeight,
+        isBroken: false
     };
     platformArray.push(platform);
 
@@ -158,12 +167,16 @@ function placePlatforms() {
         let randomX = Math.random() * (boardWidth - platformWidth); 
         let randomY = boardHeight - i * 100; 
 
+        // Randomly decide if the platform should be broken
+        let isBroken = Math.random() < 0.2; // 20% chance to be a broken platform
+
         platform = {
-            img: platformImg,
+            img: isBroken ? brokenPlatformImg : platformImg, // Use broken platform image if `isBroken` is true
             x: randomX,
             y: randomY,
             width: platformWidth,
-            height: platformHeight
+            height: platformHeight,
+            isBroken: isBroken // Store whether the platform is broken
         };
 
         platformArray.push(platform);
@@ -172,12 +185,15 @@ function placePlatforms() {
 
 function newPlatform() {
     let randomX = Math.random() * (boardWidth - platformWidth); // Random X position
+    let isBroken = Math.random() < 0.2; // 20% chance to be a broken platform
+
     let platform = {
-        img: platformImg,
+        img: isBroken ? brokenPlatformImg : platformImg, // Use broken platform image if `isBroken` is true
         x: randomX,
         y: -platformHeight, 
         width: platformWidth,
-        height: platformHeight
+        height: platformHeight,
+        isBroken: isBroken // Store whether the platform is broken
     };
 
     platformArray.push(platform);
