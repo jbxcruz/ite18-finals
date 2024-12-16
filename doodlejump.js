@@ -127,7 +127,7 @@ function update() {
 
     // Update score and display it with player name
     updateScore();
-    context.fillStyle = "white";
+    context.fillStyle = "black";
     context.font = "16px sans-serif";
     context.fillText(`${playerName}'s Score: ${score}`, 5, 20);
 
@@ -169,27 +169,25 @@ function moveDoodler(e) {
 function placePlatforms() {
     platformArray = [];
 
-    // Create the first platform at the bottom of the screen
     let platform = {
         img: platformImg,
         x: boardWidth / 2 - platformWidth / 2,
         y: boardHeight - platformHeight - 10,
         width: platformWidth,
         height: platformHeight,
-        isBreakable: false // This platform is not breakable
+        isBreakable: false
     };
     platformArray.push(platform);
 
-    // Create 6 more platforms at random heights, with breakable platform randomness
     for (let i = 1; i <= 6; i++) {
-        let randomX = Math.random() * (boardWidth - platformWidth); // Random X position 
-        let randomY = boardHeight - (i * 500); // Positioning platforms progressively upwards
+        let randomX = Math.random() * (boardWidth - platformWidth); 
+        let randomY = boardHeight - i * 100; 
 
-        // 50% chance for a breakable platform
-        let isBreakable = Math.random() < 0.5; // Adjust this percentage as needed
+        // 50% chance for the platform to be breakable
+        let isBreakable = Math.random() < 0.5; 
 
         platform = {
-            img: isBreakable ? breakablePlatformImg : platformImg, // Use breakable platform image if isBreakable is true
+            img: isBreakable ? breakablePlatformImg : platformImg,  // Use breakable platform image if isBreakable is true
             x: randomX,
             y: randomY,
             width: platformWidth,
@@ -200,7 +198,6 @@ function placePlatforms() {
         platformArray.push(platform);
     }
 }
-
 
 function newPlatform() {
     let randomX = Math.random() * (boardWidth - platformWidth); // Random X position
