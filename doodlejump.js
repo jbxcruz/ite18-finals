@@ -163,7 +163,7 @@ function placePlatforms() {
     platformArray.push(platform);
 
     // Increase the number of platforms and their vertical placement variance
-    for (let i = 1; i <= 8; i++) {  // Increased the number of platforms
+    for (let i = 1; i <= 15; i++) {  // Increased the number of platforms
         let randomX = Math.random() * (boardWidth - platformWidth);
         let randomY = boardHeight - (i * 50) - Math.random() * 50; // Add random variation to vertical spacing
 
@@ -207,13 +207,16 @@ function detectCollision(a, b) {
 }
 
 function updateScore() {
-    // Calculate score based on how far the player has moved upwards
-    if (doodler.y < initialY) {  // If the player is higher than the starting position
-        score = Math.floor((initialY - doodler.y) / 10);  // Score increases as the player moves up
+    let points = Math.floor(50 * Math.random()); //(0-1) *50 --> (0-50)
+    if (velocityY < 0) { //negative going up
+        maxScore += points;
+        if (score < maxScore) {
+            score = maxScore;
+        }
+    } else if (velocityY >= 0) {
+        maxScore -= points;
     }
 }
-
-
 
 
 function generateStars() {
