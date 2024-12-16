@@ -207,12 +207,12 @@ function detectCollision(a, b) {
 }
 
 function updateScore() {
-    // If the player goes higher (lower Y value), increase the score
-    if (doodler.y < maxScore || maxScore === 0) {
-        maxScore = doodler.y; // Track the highest point (lowest Y value)
-        score = Math.floor((doodler.y - maxScore) / 10); // Score increases based on vertical progress
+    // Calculate score based on how far the player has moved upwards
+    if (doodler.y < initialY) {  // If the player is higher than the starting position
+        score = Math.floor((initialY - doodler.y) / 10);  // Score increases as the player moves up
     }
 }
+
 
 
 
