@@ -30,6 +30,7 @@ let platformArray = [];
 let platformWidth = 60;
 let platformHeight = 18;
 let platformImg;
+let brokenPlatformImg; // Image for broken platform
 
 let stars = [];
 let numStars = 100;
@@ -63,6 +64,9 @@ window.onload = function () {
 
     platformImg = new Image();
     platformImg.src = "./platform.png";
+
+    brokenPlatformImg = new Image(); // Initialize broken platform image
+    brokenPlatformImg.src = "./platform-broken.png";
 
     velocityY = initialVelocityY;
     placePlatforms();
@@ -112,8 +116,8 @@ function update() {
 
     // Update score and display it with player name
     updateScore();
-    context.fillStyle = "black";
-    context.font = "16px sans-serif";
+    context.fillStyle = "white";
+    context.font = "20px 'Gloria Hallelujah', cursive;
     context.fillText(`${playerName}'s Score: ${score}`, 5, 20);
 
     // Display high score at the top-right corner
@@ -167,8 +171,11 @@ function placePlatforms() {
         let randomX = Math.random() * (boardWidth - platformWidth); 
         let randomY = boardHeight - i * 100; 
 
+        // Randomly decide whether to spawn a normal or broken platform (30% chance for broken)
+        let platformType = Math.random() < 0.3 ? brokenPlatformImg : platformImg;
+
         platform = {
-            img: platformImg,
+            img: platformType,
             x: randomX,
             y: randomY,
             width: platformWidth,
@@ -181,8 +188,12 @@ function placePlatforms() {
 
 function newPlatform() {
     let randomX = Math.random() * (boardWidth - platformWidth); // Random X position
+
+    // Randomly decide whether to spawn a normal or broken platform (30% chance for broken)
+    let platformType = Math.random() < 0.3 ? brokenPlatformImg : platformImg;
+
     let platform = {
-        img: platformImg,
+        img: platformType,
         x: randomX,
         y: -platformHeight, 
         width: platformWidth,
