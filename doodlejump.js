@@ -1,6 +1,5 @@
 
 
-
 let board;
 let boardWidth = 360;
 let boardHeight = 576;
@@ -23,13 +22,17 @@ let doodler = {
 
 let velocityX = 0;
 let velocityY = 0; 
-let initialVelocityY = -8; 
-let gravity = 0.4;
+let jumpVelocity = -8;  // Initial upward velocity for jumping
+let bounceGravity = 0.3; // Reduced gravity when going up (to make the jump faster)
+let fallGravity = 0.6;   // Increased gravity when falling (to make the fall slower)
 
 let platformArray = [];
 let platformWidth = 60;
 let platformHeight = 18;
 let platformImg;
+
+let breakablePlatformImg = new Image();
+breakablePlatformImg.src = "./platform-broken.png"; // Image for breakable platforms
 
 let stars = [];
 let numStars = 100;
@@ -64,7 +67,7 @@ window.onload = function () {
     platformImg = new Image();
     platformImg.src = "./platform.png";
 
-    velocityY = initialVelocityY;
+    velocityY = jumpVelocity;
     placePlatforms();
     generateStars();
     requestAnimationFrame(update);
@@ -87,7 +90,7 @@ function update() {
         doodler.x = boardWidth;
     }
 
-    velocityY += gravity;
+    velocityY += (velocityY < 0 ? bounceGravity : fallGravity); // Adjust gravity depending on direction
     doodler.y += velocityY;
     if (doodler.y > board.height) {
         gameOver = true;
@@ -96,15 +99,27 @@ function update() {
 
     for (let i = 0; i < platformArray.length; i++) {
         let platform = platformArray[i];
+
         if (velocityY < 0 && doodler.y < boardHeight * 3 / 4) {
-            platform.y -= initialVelocityY; // Slide platform down
+            platform.y -= jumpVelocity; // Slide platform down
         }
+
         if (detectCollision(doodler, platform) && velocityY >= 0) {
-            velocityY = initialVelocityY; // Jump
+            if (platform.isBreakable) {
+                // Remove breakable platform and stop the player from jumping again
+                platformArray.splice(i, 1);
+                i--; // Adjust index because we removed an element
+                velocityY = jumpVelocity; // Reset the velocity to simulate a jump
+            } else {
+                velocityY = jumpVelocity; // Regular jump
+            }
         }
+
+        // Draw the platform
         context.drawImage(platform.img, platform.x, platform.y, platform.width, platform.height);
     }
 
+    // Remove off-screen platforms
     while (platformArray.length > 0 && platformArray[0].y >= boardHeight) {
         platformArray.shift(); // Removes first element from the array
         newPlatform(); // Replace with new platform on top
@@ -143,7 +158,7 @@ function moveDoodler(e) {
         };
 
         velocityX = 0;
-        velocityY = initialVelocityY;
+        velocityY = jumpVelocity;
         score = 0;
         maxScore = 0;
         gameOver = false;
@@ -159,7 +174,8 @@ function placePlatforms() {
         x: boardWidth / 2 - platformWidth / 2,
         y: boardHeight - platformHeight - 10,
         width: platformWidth,
-        height: platformHeight
+        height: platformHeight,
+        isBreakable: false
     };
     platformArray.push(platform);
 
@@ -167,12 +183,16 @@ function placePlatforms() {
         let randomX = Math.random() * (boardWidth - platformWidth); 
         let randomY = boardHeight - i * 100; 
 
+        // 20% chance for the platform to be breakable
+        let isBreakable = Math.random() < 0.2; 
+
         platform = {
-            img: platformImg,
+            img: isBreakable ? breakablePlatformImg : platformImg,  // Use breakable platform image if isBreakable is true
             x: randomX,
             y: randomY,
             width: platformWidth,
-            height: platformHeight
+            height: platformHeight,
+            isBreakable: isBreakable
         };
 
         platformArray.push(platform);
@@ -186,7 +206,8 @@ function newPlatform() {
         x: randomX,
         y: -platformHeight, 
         width: platformWidth,
-        height: platformHeight
+        height: platformHeight,
+        isBreakable: false
     };
 
     platformArray.push(platform);
