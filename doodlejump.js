@@ -39,6 +39,7 @@ let maxScore = 0;
 let gameOver = false;
 let highScore = 0; // Track high score
 let playerName = ''; // Store player's name
+let lastYPosition = doodlerY; // Track the last Y position to detect upward movement
 
 window.onload = function () {
     playerName = prompt("Enter your name:"); // Ask for the player's name
@@ -199,20 +200,18 @@ function detectCollision(a, b) {
 }
 
 function updateScore() {
-    let points = Math.floor(50 * Math.random()); //(0-1) *50 --> (0-50)
-    if (velocityY < 0) { // Negative velocity means the character is going up
-        maxScore += points;
-        if (score < maxScore) {
-            score = maxScore;
-        }
-    } else if (velocityY >= 0) {
-        maxScore -= points;
+    // Increase the score when the player is going upwards
+    if (doodler.y < lastYPosition) {
+        score += 1; // Increment the score as the player goes up
+        maxScore = score > maxScore ? score : maxScore; // Track max score during the game session
     }
 
     // Update high score if current score exceeds it
     if (score > highScore) {
         highScore = score;
     }
+
+    lastYPosition = doodler.y; // Update last Y position for the next frame
 }
 
 function generateStars() {
