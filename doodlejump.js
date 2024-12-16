@@ -162,9 +162,10 @@ function placePlatforms() {
     };
     platformArray.push(platform);
 
-    for (let i = 1; i <= 6; i++) {
-        let randomX = Math.random() * (boardWidth - platformWidth); 
-        let randomY = boardHeight - i * 100; 
+    // Increase the number of platforms and their vertical placement variance
+    for (let i = 1; i <= 15; i++) {  // Increased the number of platforms
+        let randomX = Math.random() * (boardWidth - platformWidth);
+        let randomY = boardHeight - (i * 50) - Math.random() * 50; // Add random variation to vertical spacing
 
         // Randomly decide if the platform should be broken
         let isBroken = Math.random() < 0.2; // 20% chance to be a broken platform
