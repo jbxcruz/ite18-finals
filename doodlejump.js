@@ -127,7 +127,7 @@ function update() {
 
     // Update score and display it with player name
     updateScore();
-    context.fillStyle = "black";
+    context.fillStyle = "white";
     context.font = "16px sans-serif";
     context.fillText(`${playerName}'s Score: ${score}`, 5, 20);
 
@@ -183,8 +183,8 @@ function placePlatforms() {
         let randomX = Math.random() * (boardWidth - platformWidth); 
         let randomY = boardHeight - i * 100; 
 
-        // 20% chance for the platform to be breakable
-        let isBreakable = Math.random() < 0.2; 
+        // 30% chance for the platform to be breakable
+        let isBreakable = Math.random() < 0.3; 
 
         platform = {
             img: isBreakable ? breakablePlatformImg : platformImg,  // Use breakable platform image if isBreakable is true
