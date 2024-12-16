@@ -113,7 +113,7 @@ function update() {
     // Update score and display it with player name
     updateScore();
     context.fillStyle = "black";
-    context.font = "16px sans-serif";
+    context.font = "20px 'Gloria Hallelujah', cursive";
     context.fillText(`${playerName}'s Score: ${score}`, 5, 20);
 
     // Display high score at the top-right corner
