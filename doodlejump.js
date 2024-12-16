@@ -94,9 +94,15 @@ function update() {
         if (velocityY < 0 && doodler.y < boardHeight * 3 / 4) {
             platform.y -= initialVelocityY; // slide platform down
         }
-        if (detectCollision(doodler, platform) && velocityY >= 0) {
-            velocityY = initialVelocityY; // jump
-        }
+        if (
+    velocityY > 0 && // Ensure doodler is falling
+    doodler.y + doodler.height <= platform.y + 10 && // Bottom of doodler is near the top of platform
+    doodler.y + doodler.height >= platform.y && // Doodler has just landed on the platform
+    doodler.x + doodler.width > platform.x && // Doodler's right edge is past the platform's left edge
+    doodler.x < platform.x + platform.width // Doodler's left edge is before the platform's right edge
+) {
+    velocityY = initialVelocityY; // Jump after landing
+}
         context.drawImage(platform.img, platform.x, platform.y, platform.width, platform.height);
     }
 
