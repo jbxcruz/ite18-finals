@@ -207,12 +207,13 @@ function detectCollision(a, b) {
 }
 
 function updateScore() {
-    // Update score based on the highest Y position the player has reached
+    // If the player goes higher (lower Y value), increase the score
     if (doodler.y < maxScore || maxScore === 0) {
-        maxScore = doodler.y; // Keep track of the highest point the player has reached
-        score = Math.floor(maxScore / 10); // Convert the max Y position into a score
+        maxScore = doodler.y; // Track the highest point (lowest Y value)
+        score = Math.floor((doodler.y - maxScore) / 10); // Score increases based on vertical progress
     }
 }
+
 
 
 function generateStars() {
