@@ -91,11 +91,19 @@ function update() {
         doodler.x = boardWidth;
     }
 
-    velocityY += (velocityY < 0 ? bounceGravity : fallGravity); // Adjust gravity depending on direction
+    // Adjust gravity depending on direction
+    if (velocityY < 0) {  // When jumping upwards
+        velocityY += bounceGravity; // Reduced gravity for jumping
+    } else {  // When falling downwards
+        velocityY += fallGravity; // Increased gravity for falling
+    }
+
     doodler.y += velocityY;
+
     if (doodler.y > board.height) {
         gameOver = true;
     }
+    
     context.drawImage(doodler.img, doodler.x, doodler.y, doodler.width, doodler.height);
 
     for (let i = 0; i < platformArray.length; i++) {
@@ -182,7 +190,7 @@ function placePlatforms() {
 
     for (let i = 1; i <= 6; i++) {
         let randomX = Math.random() * (boardWidth - platformWidth); 
-        let randomY = boardHeight - i * 150; 
+        let randomY = boardHeight - i * 100; 
 
         // 20% chance for the platform to be breakable
         let isBreakable = Math.random() < 0.2; 
