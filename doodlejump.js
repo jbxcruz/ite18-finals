@@ -206,17 +206,15 @@ function detectCollision(a, b) {
         a.y + a.height > b.y;    
 }
 
+
 function updateScore() {
-    let points = Math.floor(50 * Math.random()); //(0-1) *50 --> (0-50)
-    if (velocityY < 0) { //negative going up
-        maxScore += points;
-        if (score < maxScore) {
-            score = maxScore;
-        }
-    } else if (velocityY >= 0) {
-        maxScore -= points;
+    // Check if the player has moved upward (the player's y position is less than the initial y position)
+    if (doodler.y < initialY) {
+        // Calculate the score as the difference between the initial position and the current position
+        score = Math.floor((initialY - doodler.y) / 10);  // Adjust the divisor to control score increment rate
     }
 }
+
 
 
 function generateStars() {
