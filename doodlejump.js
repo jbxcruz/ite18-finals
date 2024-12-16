@@ -1,10 +1,7 @@
-
-
 let board;
 let boardWidth = 360;
 let boardHeight = 576;
 let context;
-
 
 let doodlerWidth = 46;
 let doodlerHeight = 46;
@@ -21,18 +18,15 @@ let doodler = {
     height: doodlerHeight
 };
 
-
 let velocityX = 0;
 let velocityY = 0; 
 let initialVelocityY = -8; 
 let gravity = 0.4;
 
-
 let platformArray = [];
 let platformWidth = 60;
 let platformHeight = 18;
 let platformImg;
-
 
 let stars = [];
 let numStars = 100;
@@ -41,16 +35,18 @@ let score = 0;
 let maxScore = 0;
 let gameOver = false;
 
+let shakeOffsetX = 0;
+let shakeOffsetY = 0;
+let shakeDuration = 0;
+
 window.onload = function () {
     board = document.getElementById("board");
     board.height = boardHeight;
     board.width = boardWidth;
-    context = board.getContext("2d"); 
+    context = board.getContext("2d");
 
- 
     board.style.margin = "auto";
     board.style.display = "block";
-
 
     doodlerRightImg = new Image();
     doodlerRightImg.src = "./doodler-right.png";
@@ -75,14 +71,13 @@ window.onload = function () {
 function update() {
     requestAnimationFrame(update);
     if (gameOver) {
+        shakeScreen(); // Trigger screen shake when the game is over
         return;
     }
     context.clearRect(0, 0, board.width, board.height);
 
-   
     drawStars();
 
-    
     doodler.x += velocityX;
     if (doodler.x > boardWidth) {
         doodler.x = 0;
@@ -97,7 +92,6 @@ function update() {
     }
     context.drawImage(doodler.img, doodler.x, doodler.y, doodler.width, doodler.height);
 
-    
     for (let i = 0; i < platformArray.length; i++) {
         let platform = platformArray[i];
         if (velocityY < 0 && doodler.y < boardHeight * 3 / 4) {
@@ -109,7 +103,6 @@ function update() {
         context.drawImage(platform.img, platform.x, platform.y, platform.width, platform.height);
     }
 
-    
     while (platformArray.length > 0 && platformArray[0].y >= boardHeight) {
         platformArray.shift(); //removes first element from the array
         newPlatform(); //replace with new platform on top
@@ -155,7 +148,6 @@ function moveDoodler(e) {
 function placePlatforms() {
     platformArray = [];
 
-   
     let platform = {
         img: platformImg,
         x: boardWidth / 2 - platformWidth / 2,
@@ -165,7 +157,6 @@ function placePlatforms() {
     };
     platformArray.push(platform);
 
-    
     for (let i = 1; i <= 6; i++) {
         let randomX = Math.random() * (boardWidth - platformWidth); 
         let randomY = boardHeight - i * 100; 
@@ -214,7 +205,6 @@ function updateScore() {
     }
 }
 
-
 function generateStars() {
     for (let i = 0; i < numStars; i++) {
         stars.push({
@@ -232,7 +222,6 @@ function drawStars() {
         context.arc(star.x, star.y, star.radius, 0, 2 * Math.PI);
         context.fill();
 
-       
         star.y += 0.5;
         if (star.y > boardHeight) {
             star.y = 0;
@@ -241,6 +230,15 @@ function drawStars() {
     }
 }
 
+function shakeScreen() {
+    if (shakeDuration > 0) {
+        shakeOffsetX = (Math.random() - 0.5) * 10; // Random shake offset
+        shakeOffsetY = (Math.random() - 0.5) * 10;
+        shakeDuration--;
+    } else {
+        shakeOffsetX = 0;
+        shakeOffsetY = 0;
+    }
 
-
-
+    context.translate(shakeOffsetX, shakeOffsetY);
+}
