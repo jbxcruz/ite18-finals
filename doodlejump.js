@@ -226,8 +226,8 @@ function detectCollision(a, b) {
 }
 
 function updateScore() {
-    // Increase the score when the player is going upwards
-    if (doodler.y < lastYPosition) {
+    // Increase the score only when the player is moving upwards (velocityY is negative)
+    if (velocityY < 0) {
         score += 1; // Increment the score as the player goes up
         maxScore = score > maxScore ? score : maxScore; // Track max score during the game session
     }
@@ -239,6 +239,7 @@ function updateScore() {
 
     lastYPosition = doodler.y; // Update last Y position for the next frame
 }
+
 
 function generateStars() {
     for (let i = 0; i < numStars; i++) {
