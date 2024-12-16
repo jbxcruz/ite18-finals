@@ -1,7 +1,5 @@
 
 
-
-
 let board;
 let boardWidth = 360;
 let boardHeight = 576;
@@ -184,14 +182,23 @@ function placePlatforms() {
 
     // Define a minimum vertical distance between platforms
     const minVerticalDistance = 100;
+    const minHorizontalSpacing = 70; // Minimum horizontal spacing between platforms
 
-    // Generate 6 additional platforms
+    // Generate 6 additional platforms, ensuring even distribution
+    let currentX = platform.x; // Start with the first platform's X position
+    let yOffset = minVerticalDistance; // Initial vertical offset
+
     for (let i = 1; i <= 6; i++) {
         let randomX = Math.random() * (boardWidth - platformWidth); // Random X position
         let randomY = boardHeight - (i * minVerticalDistance) - Math.random() * 50; // Random Y position within the bounds
 
+        // Ensure platforms are evenly spaced horizontally
+        while (Math.abs(currentX - randomX) < minHorizontalSpacing) {
+            randomX = Math.random() * (boardWidth - platformWidth); // Randomize again if too close
+        }
+
         // 20% chance for the platform to be breakable
-        let isBreakable = Math.random() < 0.2; 
+        let isBreakable = Math.random() < 0.2;
 
         platform = {
             img: isBreakable ? breakablePlatformImg : platformImg,  // Use breakable platform image if isBreakable is true
@@ -203,24 +210,7 @@ function placePlatforms() {
         };
 
         platformArray.push(platform);
-    }
-
-    // Adjust horizontal spread for better balance
-    adjustPlatformHorizontalBalance();
-}
-
-function adjustPlatformHorizontalBalance() {
-    // Ensure the platforms are spread out across the screen horizontally
-    const platformSpacing = 70; // Minimum horizontal gap between platforms
-    let currentX = platformArray[0].x; // Start with the first platform
-
-    for (let i = 1; i < platformArray.length; i++) {
-        // Adjust the X position of each platform to ensure they are spaced out enough
-        if (Math.abs(currentX - platformArray[i].x) < platformSpacing) {
-            // If the distance is too small, move the platform to a new random position
-            platformArray[i].x = Math.random() * (boardWidth - platformWidth);
-        }
-        currentX = platformArray[i].x; // Update currentX for next iteration
+        currentX = randomX; // Update currentX for next platform
     }
 }
 
@@ -257,7 +247,16 @@ function updateScore() {
         highScore = score;
     }
 
-    lastYPosition = doodler.y; // Update the last Y position
+    lastYPosition = doodler.y; // Update last Y position for the next frame
+}
+
+function generateStars() {
+    for (let i = 0; i < numStars; i++) {
+        stars.push({
+            x: Math.random() * boardWidth,
+            y: Math.random() * boardHeight
+        });
+    }
 }
 
 function drawStars() {
@@ -267,14 +266,5 @@ function drawStars() {
         context.beginPath();
         context.arc(star.x, star.y, 2, 0, 2 * Math.PI);
         context.fill();
-    }
-}
-
-function generateStars() {
-    for (let i = 0; i < numStars; i++) {
-        stars.push({
-            x: Math.random() * boardWidth,
-            y: Math.random() * boardHeight
-        });
     }
 }
