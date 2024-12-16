@@ -1,7 +1,6 @@
 
 
 
-
 let board;
 let boardWidth = 360;
 let boardHeight = 576;
@@ -31,7 +30,6 @@ let platformArray = [];
 let platformWidth = 60;
 let platformHeight = 18;
 let platformImg;
-let brokenPlatformImg;
 
 let stars = [];
 let numStars = 100;
@@ -66,9 +64,6 @@ window.onload = function () {
     platformImg = new Image();
     platformImg.src = "./platform.png";
 
-    brokenPlatformImg = new Image();
-    brokenPlatformImg.src = "./broken-platform.png"; // Load the broken platform image
-
     velocityY = initialVelocityY;
     placePlatforms();
     generateStars();
@@ -101,26 +96,12 @@ function update() {
 
     for (let i = 0; i < platformArray.length; i++) {
         let platform = platformArray[i];
-
-        if (platform.broken) {
-            continue; // Skip drawing broken platforms
-        }
-
         if (velocityY < 0 && doodler.y < boardHeight * 3 / 4) {
             platform.y -= initialVelocityY; // Slide platform down
         }
-
-        // Log platform info for debugging
-        console.log(`Platform ${i}: x=${platform.x}, y=${platform.y}`);
-        
         if (detectCollision(doodler, platform) && velocityY >= 0) {
             velocityY = initialVelocityY; // Jump
-            if (platform.img === brokenPlatformImg) {
-                platform.broken = true; // Mark platform as broken
-                platformArray.splice(i, 1); // Remove the broken platform from the array
-            }
         }
-
         context.drawImage(platform.img, platform.x, platform.y, platform.width, platform.height);
     }
 
@@ -173,7 +154,6 @@ function moveDoodler(e) {
 function placePlatforms() {
     platformArray = [];
 
-    // Regular platform
     let platform = {
         img: platformImg,
         x: boardWidth / 2 - platformWidth / 2,
@@ -183,18 +163,6 @@ function placePlatforms() {
     };
     platformArray.push(platform);
 
-    // Broken platform (new platform type)
-    platform = {
-        img: brokenPlatformImg,
-        x: boardWidth / 4 - platformWidth / 2,
-        y: boardHeight - platformHeight * 2,
-        width: platformWidth,
-        height: platformHeight,
-        broken: false // Keep track of whether the platform is broken
-    };
-    platformArray.push(platform);
-
-    // More regular platforms
     for (let i = 1; i <= 6; i++) {
         let randomX = Math.random() * (boardWidth - platformWidth); 
         let randomY = boardHeight - i * 100; 
@@ -260,7 +228,13 @@ function drawStars() {
     context.fillStyle = "white";
     for (let star of stars) {
         context.beginPath();
-        context.arc(star.x, star.y, star.radius, 0, Math.PI * 2);
+        context.arc(star.x, star.y, star.radius, 0, 2 * Math.PI);
         context.fill();
+
+        star.y += 0.5;
+        if (star.y > boardHeight) {
+            star.y = 0;
+            star.x = Math.random() * boardWidth;
+        }
     }
 }
