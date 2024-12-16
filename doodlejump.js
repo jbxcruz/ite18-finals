@@ -116,7 +116,7 @@ function update() {
     updateScore();
     context.fillStyle = "black";
     context.font = "16px sans-serif";
-    context.fillText(`Score: ${score}`, 5, 20);
+    context.fillText(Score: ${score}, 5, 20);
 
     if (gameOver) {
         context.fillText("Game Over: Press 'Space' to Restart", boardWidth / 7, boardHeight * 7 / 8);
@@ -162,16 +162,15 @@ function placePlatforms() {
     };
     platformArray.push(platform);
 
-    // Increase the number of platforms and their vertical placement variance
-    for (let i = 1; i <= 15; i++) {  // Increased the number of platforms
-        let randomX = Math.random() * (boardWidth - platformWidth);
-        let randomY = boardHeight - (i * 50) - Math.random() * 50; // Add random variation to vertical spacing
+    for (let i = 1; i <= 6; i++) {
+        let randomX = Math.random() * (boardWidth - platformWidth); 
+        let randomY = boardHeight - i * 100; 
 
         // Randomly decide if the platform should be broken
         let isBroken = Math.random() < 0.2; // 20% chance to be a broken platform
 
         platform = {
-            img: isBroken ? brokenPlatformImg : platformImg, // Use broken platform image if `isBroken` is true
+            img: isBroken ? brokenPlatformImg : platformImg, // Use broken platform image if isBroken is true
             x: randomX,
             y: randomY,
             width: platformWidth,
@@ -188,7 +187,7 @@ function newPlatform() {
     let isBroken = Math.random() < 0.2; // 20% chance to be a broken platform
 
     let platform = {
-        img: isBroken ? brokenPlatformImg : platformImg, // Use broken platform image if `isBroken` is true
+        img: isBroken ? brokenPlatformImg : platformImg, // Use broken platform image if isBroken is true
         x: randomX,
         y: -platformHeight, 
         width: platformWidth,
@@ -206,20 +205,13 @@ function detectCollision(a, b) {
         a.y + a.height > b.y;    
 }
 
-
 function updateScore() {
-    // Increase score only when moving upward (when vy is negative)
-    if (player.vy < 0) { // When moving up
-        score++;
+    // Update score only if the player has reached a new height (max upward progress)
+    if (doodler.y < boardHeight * 3 / 4) {
+        maxScore = Math.max(maxScore, Math.floor(boardHeight * 3 / 4 - doodler.y));
+        score = maxScore; // The score represents the farthest upward distance
     }
-
-    // Update the displayed score
-    var scoreText = document.getElementById("score");
-    scoreText.innerHTML = score;
 }
-
-
-
 
 function generateStars() {
     for (let i = 0; i < numStars; i++) {
