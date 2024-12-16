@@ -191,15 +191,13 @@ function detectCollision(a, b) {
 }
 
 function updateScore() {
-    if (velocityY < 0) { // Moving up
-        score += 1; // Increment score gradually
-    } else if (velocityY >= 0) { // Falling
-        score -= 1; // Penalize slightly
-        if (score < 0) {
-            score = 0; // Prevent negative scores
-        }
+    // Update score only if the player has reached a new height (max upward progress)
+    if (doodler.y < boardHeight * 3 / 4) {
+        maxScore = Math.max(maxScore, Math.floor(boardHeight * 3 / 4 - doodler.y));
+        score = maxScore; // The score represents the farthest upward distance
     }
 }
+
 
 function generateStars() {
     for (let i = 0; i < numStars; i++) {
