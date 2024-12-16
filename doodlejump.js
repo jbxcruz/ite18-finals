@@ -23,7 +23,7 @@ let doodler = {
 let velocityX = 0;
 let velocityY = 0; 
 let initialVelocityY = -6; 
-let gravity = 0.3;
+let gravity = 0.4;
 
 let platformArray = [];
 let platformWidth = 60;
