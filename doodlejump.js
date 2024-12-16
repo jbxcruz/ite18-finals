@@ -30,6 +30,7 @@ let platformArray = [];
 let platformWidth = 60;
 let platformHeight = 18;
 let platformImg;
+let breakingPlatformImg;
 
 let stars = [];
 let numStars = 100;
@@ -63,6 +64,8 @@ window.onload = function () {
 
     platformImg = new Image();
     platformImg.src = "./platform.png";
+    breakingPlatformImg = new Image(); // Image for the breaking platform
+    breakingPlatformImg.src = "./breaking-platform.png"; // Assume you have an image for it
 
     velocityY = initialVelocityY;
     placePlatforms();
@@ -96,12 +99,20 @@ function update() {
 
     for (let i = 0; i < platformArray.length; i++) {
         let platform = platformArray[i];
-        if (velocityY < 0 && doodler.y < boardHeight * 3 / 4) {
-            platform.y -= initialVelocityY; // Slide platform down
+
+        // If the platform is a breaking platform and the player steps on it, remove it
+        if (platform.isBreaking && detectCollision(doodler, platform) && velocityY >= 0) {
+            platformArray.splice(i, 1); // Remove the breaking platform from the array
+            velocityY = initialVelocityY; // Make the character jump or fall
+            i--; // Adjust the loop index after removal
         }
-        if (detectCollision(doodler, platform) && velocityY >= 0) {
-            velocityY = initialVelocityY; // Jump
+
+        // For normal platforms or breaking platforms, we still check for collisions
+        if (detectCollision(doodler, platform) && velocityY >= 0 && !platform.isBreaking) {
+            velocityY = initialVelocityY; // Jump on regular platforms
         }
+
+        // Draw the platform
         context.drawImage(platform.img, platform.x, platform.y, platform.width, platform.height);
     }
 
@@ -113,7 +124,7 @@ function update() {
     // Update score and display it with player name
     updateScore();
     context.fillStyle = "black";
-    context.font = "16px 'Gloria Hallelujah', cursive";
+    context.font = "16px sans-serif";
     context.fillText(`${playerName}'s Score: ${score}`, 5, 20);
 
     // Display high score at the top-right corner
@@ -154,12 +165,25 @@ function moveDoodler(e) {
 function placePlatforms() {
     platformArray = [];
 
+    // Add some regular platforms
     let platform = {
         img: platformImg,
         x: boardWidth / 2 - platformWidth / 2,
         y: boardHeight - platformHeight - 10,
         width: platformWidth,
-        height: platformHeight
+        height: platformHeight,
+        isBreaking: false
+    };
+    platformArray.push(platform);
+
+    // Add some breaking platforms
+    platform = {
+        img: breakingPlatformImg,
+        x: boardWidth / 2 - platformWidth / 2 + 100,
+        y: boardHeight - platformHeight - 100,
+        width: platformWidth,
+        height: platformHeight,
+        isBreaking: true // Mark this platform as breaking
     };
     platformArray.push(platform);
 
@@ -172,7 +196,8 @@ function placePlatforms() {
             x: randomX,
             y: randomY,
             width: platformWidth,
-            height: platformHeight
+            height: platformHeight,
+            isBreaking: false
         };
 
         platformArray.push(platform);
@@ -186,7 +211,8 @@ function newPlatform() {
         x: randomX,
         y: -platformHeight, 
         width: platformWidth,
-        height: platformHeight
+        height: platformHeight,
+        isBreaking: Math.random() < 0.3 // Randomly make 30% of platforms breakable
     };
 
     platformArray.push(platform);
