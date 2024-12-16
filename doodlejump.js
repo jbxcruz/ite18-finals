@@ -1,6 +1,5 @@
 
 
-
 let board;
 let boardWidth = 360;
 let boardHeight = 576;
@@ -30,7 +29,7 @@ let platformArray = [];
 let platformWidth = 60;
 let platformHeight = 18;
 let platformImg;
-let brokenPlatformImg; // Image for broken platform
+let brokenPlatformImg;
 
 let stars = [];
 let numStars = 100;
@@ -65,8 +64,8 @@ window.onload = function () {
     platformImg = new Image();
     platformImg.src = "./platform.png";
 
-    brokenPlatformImg = new Image(); // Initialize broken platform image
-    brokenPlatformImg.src = "./platform-broken.png";
+    brokenPlatformImg = new Image();
+    brokenPlatformImg.src = "./broken-platform.png"; // Load the broken platform image
 
     velocityY = initialVelocityY;
     placePlatforms();
@@ -100,11 +99,20 @@ function update() {
 
     for (let i = 0; i < platformArray.length; i++) {
         let platform = platformArray[i];
+
+        if (platform.broken) {
+            continue; // Skip drawing broken platforms
+        }
+
         if (velocityY < 0 && doodler.y < boardHeight * 3 / 4) {
             platform.y -= initialVelocityY; // Slide platform down
         }
         if (detectCollision(doodler, platform) && velocityY >= 0) {
             velocityY = initialVelocityY; // Jump
+            if (platform.img === brokenPlatformImg) {
+                platform.broken = true; // Mark platform as broken
+                platformArray.splice(i, 1); // Remove the broken platform from the array
+            }
         }
         context.drawImage(platform.img, platform.x, platform.y, platform.width, platform.height);
     }
@@ -116,8 +124,8 @@ function update() {
 
     // Update score and display it with player name
     updateScore();
-    context.fillStyle = "white";
-    context.font = "20px 'Gloria Hallelujah', cursive;
+    context.fillStyle = "black";
+    context.font = "20px 'Gloria Hallelujah', cursive";
     context.fillText(`${playerName}'s Score: ${score}`, 5, 20);
 
     // Display high score at the top-right corner
@@ -158,6 +166,7 @@ function moveDoodler(e) {
 function placePlatforms() {
     platformArray = [];
 
+    // Regular platform
     let platform = {
         img: platformImg,
         x: boardWidth / 2 - platformWidth / 2,
@@ -167,15 +176,24 @@ function placePlatforms() {
     };
     platformArray.push(platform);
 
+    // Broken platform (new platform type)
+    platform = {
+        img: brokenPlatformImg,
+        x: boardWidth / 4 - platformWidth / 2,
+        y: boardHeight - platformHeight * 2,
+        width: platformWidth,
+        height: platformHeight,
+        broken: false // Keep track of whether the platform is broken
+    };
+    platformArray.push(platform);
+
+    // More regular platforms
     for (let i = 1; i <= 6; i++) {
         let randomX = Math.random() * (boardWidth - platformWidth); 
         let randomY = boardHeight - i * 100; 
 
-        // Randomly decide whether to spawn a normal or broken platform (30% chance for broken)
-        let platformType = Math.random() < 0.3 ? brokenPlatformImg : platformImg;
-
         platform = {
-            img: platformType,
+            img: platformImg,
             x: randomX,
             y: randomY,
             width: platformWidth,
@@ -188,12 +206,8 @@ function placePlatforms() {
 
 function newPlatform() {
     let randomX = Math.random() * (boardWidth - platformWidth); // Random X position
-
-    // Randomly decide whether to spawn a normal or broken platform (30% chance for broken)
-    let platformType = Math.random() < 0.3 ? brokenPlatformImg : platformImg;
-
     let platform = {
-        img: platformType,
+        img: platformImg,
         x: randomX,
         y: -platformHeight, 
         width: platformWidth,
