@@ -32,7 +32,7 @@ let platformHeight = 18;
 let platformImg;
 
 let breakablePlatformImg = new Image(); // Declare a new image for breakable platforms
-breakablePlatformImg.src = './breakable-platform.png'; // Use your image URL here
+breakablePlatformImg.src = './platform-broken.png'; // Use your image URL here
 
 let stars = [];
 let numStars = 100;
