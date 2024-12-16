@@ -65,7 +65,7 @@ window.onload = function () {
     platformImg = new Image();
     platformImg.src = "./platform.png";
     breakingPlatformImg = new Image(); // Image for the breaking platform
-    breakingPlatformImg.src = "./platform-broken.png"; // Assume you have an image for it
+    breakingPlatformImg.src = "./breaking-platform.png"; // Assume you have an image for it
 
     velocityY = initialVelocityY;
     placePlatforms();
@@ -123,7 +123,7 @@ function update() {
 
     // Update score and display it with player name
     updateScore();
-    context.fillStyle = "black";
+    context.fillStyle = "white";
     context.font = "16px sans-serif";
     context.fillText(`${playerName}'s Score: ${score}`, 5, 20);
 
@@ -226,8 +226,8 @@ function detectCollision(a, b) {
 }
 
 function updateScore() {
-    // Increase the score only when the player is moving upwards (velocityY is negative)
-    if (velocityY < 0) {
+    // Increase the score when the player is going upwards
+    if (doodler.y < lastYPosition) {
         score += 1; // Increment the score as the player goes up
         maxScore = score > maxScore ? score : maxScore; // Track max score during the game session
     }
@@ -239,7 +239,6 @@ function updateScore() {
 
     lastYPosition = doodler.y; // Update last Y position for the next frame
 }
-
 
 function generateStars() {
     for (let i = 0; i < numStars; i++) {
