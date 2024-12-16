@@ -1,5 +1,3 @@
-
-
 let board;
 let boardWidth = 360;
 let boardHeight = 576;
@@ -97,6 +95,7 @@ function update() {
     }
     context.drawImage(doodler.img, doodler.x, doodler.y, doodler.width, doodler.height);
 
+    // Generate new platforms dynamically as the player moves up
     for (let i = 0; i < platformArray.length; i++) {
         let platform = platformArray[i];
 
@@ -179,35 +178,22 @@ function placePlatforms() {
     };
     platformArray.push(platform);
 
+    // Generate platforms dynamically, randomizing platform type
     for (let i = 1; i <= 6; i++) {
-        let randomX = Math.random() * (boardWidth - platformWidth); 
-        let randomY = boardHeight - i * 100; 
-
-        // 50% chance for the platform to be breakable
-        let isBreakable = Math.random() < 0.5; 
-
-        platform = {
-            img: isBreakable ? breakablePlatformImg : platformImg,  // Use breakable platform image if isBreakable is true
-            x: randomX,
-            y: randomY,
-            width: platformWidth,
-            height: platformHeight,
-            isBreakable: isBreakable
-        };
-
-        platformArray.push(platform);
+        newPlatform();
     }
 }
 
 function newPlatform() {
     let randomX = Math.random() * (boardWidth - platformWidth); // Random X position
+    let isBreakable = Math.random() < 0.5; // 50% chance for breakable platform
     let platform = {
-        img: platformImg,
+        img: isBreakable ? breakablePlatformImg : platformImg,
         x: randomX,
         y: -platformHeight, 
         width: platformWidth,
         height: platformHeight,
-        isBreakable: false
+        isBreakable: isBreakable
     };
 
     platformArray.push(platform);
