@@ -208,12 +208,16 @@ function detectCollision(a, b) {
 
 
 function updateScore() {
-    // Check if the player has moved upward (the player's y position is less than the initial y position)
-    if (doodler.y < initialY) {
-        // Calculate the score as the difference between the initial position and the current position
-        score = Math.floor((initialY - doodler.y) / 10);  // Adjust the divisor to control score increment rate
+    // Increase score only when moving upward (when vy is negative)
+    if (player.vy < 0) { // When moving up
+        score++;
     }
+
+    // Update the displayed score
+    var scoreText = document.getElementById("score");
+    scoreText.innerHTML = score;
 }
+
 
 
 
