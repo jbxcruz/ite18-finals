@@ -1,5 +1,7 @@
 
 
+
+
 let board;
 let boardWidth = 360;
 let boardHeight = 576;
@@ -21,12 +23,10 @@ let doodler = {
 };
 
 let velocityX = 0;
-let velocityY = 0; 
-let jumpVelocity = -4;  // Initial upward velocity for jumping
-let maxJumpVelocity = -10;  // Max jump speed
-let jumpAcceleration = -0.1; // Increase in velocity to simulate acceleration
-let gravity = 0.4;   // Gravity to pull the player down
-let landingDeceleration = 0.05; // Slows down when landing
+let velocityY = 0;
+let jumpVelocity = -6;  // Initial upward velocity for jumping
+let bounceGravity = 0.3; // Reduced gravity when going up (to make the jump faster)
+let fallGravity = 0.6;   // Increased gravity when falling (to make the fall slower)
 
 let platformArray = [];
 let platformWidth = 60;
@@ -92,27 +92,11 @@ function update() {
         doodler.x = boardWidth;
     }
 
-    // Apply jump acceleration (slow at first, faster after)
-    if (velocityY < maxJumpVelocity) {
-        velocityY += jumpAcceleration; // Gradually increase speed
-    }
-
-    // Apply gravity after reaching peak of jump
-    if (velocityY >= 0) {
-        velocityY += gravity; // Accelerate downwards
-    }
-
-    // Slow down when landing
-    if (velocityY > 0 && isLanding()) {
-        velocityY -= landingDeceleration; // Reduce downward velocity when landing
-    }
-
+    velocityY += (velocityY < 0 ? bounceGravity : fallGravity); // Adjust gravity depending on direction
     doodler.y += velocityY;
-
     if (doodler.y > board.height) {
         gameOver = true;
     }
-
     context.drawImage(doodler.img, doodler.x, doodler.y, doodler.width, doodler.height);
 
     for (let i = 0; i < platformArray.length; i++) {
@@ -184,32 +168,27 @@ function moveDoodler(e) {
     }
 }
 
-function isLanding() {
-    for (let platform of platformArray) {
-        if (doodler.y + doodler.height <= platform.y + 2 && 
-            detectCollision(doodler, platform) && velocityY > 0) {
-            return true; // Doodler is landing on a platform
-        }
-    }
-    return false;
-}
-
 function placePlatforms() {
     platformArray = [];
 
+    // First platform at the bottom
     let platform = {
         img: platformImg,
-        x: boardWidth / 2 - platformWidth / 2,
-        y: boardHeight - platformHeight - 10,
+        x: boardWidth / 2 - platformWidth / 2, // Center platform horizontally
+        y: boardHeight - platformHeight - 10,  // Place it just above the bottom edge
         width: platformWidth,
         height: platformHeight,
         isBreakable: false
     };
     platformArray.push(platform);
 
+    // Define a minimum vertical distance between platforms
+    const minVerticalDistance = 100;
+
+    // Generate 6 additional platforms
     for (let i = 1; i <= 6; i++) {
-        let randomX = Math.random() * (boardWidth - platformWidth); 
-        let randomY = boardHeight - i * 100; 
+        let randomX = Math.random() * (boardWidth - platformWidth); // Random X position
+        let randomY = boardHeight - (i * minVerticalDistance) - Math.random() * 50; // Random Y position within the bounds
 
         // 20% chance for the platform to be breakable
         let isBreakable = Math.random() < 0.2; 
@@ -224,6 +203,24 @@ function placePlatforms() {
         };
 
         platformArray.push(platform);
+    }
+
+    // Adjust horizontal spread for better balance
+    adjustPlatformHorizontalBalance();
+}
+
+function adjustPlatformHorizontalBalance() {
+    // Ensure the platforms are spread out across the screen horizontally
+    const platformSpacing = 70; // Minimum horizontal gap between platforms
+    let currentX = platformArray[0].x; // Start with the first platform
+
+    for (let i = 1; i < platformArray.length; i++) {
+        // Adjust the X position of each platform to ensure they are spaced out enough
+        if (Math.abs(currentX - platformArray[i].x) < platformSpacing) {
+            // If the distance is too small, move the platform to a new random position
+            platformArray[i].x = Math.random() * (boardWidth - platformWidth);
+        }
+        currentX = platformArray[i].x; // Update currentX for next iteration
     }
 }
 
@@ -260,30 +257,24 @@ function updateScore() {
         highScore = score;
     }
 
-    lastYPosition = doodler.y; // Update last Y position for the next frame
+    lastYPosition = doodler.y; // Update the last Y position
+}
+
+function drawStars() {
+    for (let i = 0; i < stars.length; i++) {
+        let star = stars[i];
+        context.fillStyle = "white";
+        context.beginPath();
+        context.arc(star.x, star.y, 2, 0, 2 * Math.PI);
+        context.fill();
+    }
 }
 
 function generateStars() {
     for (let i = 0; i < numStars; i++) {
         stars.push({
             x: Math.random() * boardWidth,
-            y: Math.random() * boardHeight,
-            radius: Math.random() * 2
+            y: Math.random() * boardHeight
         });
-    }
-}
-
-function drawStars() {
-    context.fillStyle = "white";
-    for (let star of stars) {
-        context.beginPath();
-        context.arc(star.x, star.y, star.radius, 0, 2 * Math.PI);
-        context.fill();
-
-        star.y += 0.5;
-        if (star.y > boardHeight) {
-            star.y = 0;
-            star.x = Math.random() * boardWidth;
-        }
     }
 }
