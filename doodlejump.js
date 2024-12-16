@@ -1,5 +1,6 @@
 
 
+
 let board;
 let boardWidth = 360;
 let boardHeight = 576;
@@ -21,8 +22,8 @@ let doodler = {
 };
 
 let velocityX = 0;
-let velocityY = 0; 
-let initialVelocityY = -8; 
+let velocityY = 0;
+let initialVelocityY = -8;
 let gravity = 0.4;
 
 let platformArray = [];
@@ -42,7 +43,7 @@ window.onload = function () {
     board = document.getElementById("board");
     board.height = boardHeight;
     board.width = boardWidth;
-    context = board.getContext("2d"); 
+    context = board.getContext("2d");
 
     board.style.margin = "auto";
     board.style.display = "block";
@@ -96,24 +97,24 @@ function update() {
     for (let i = 0; i < platformArray.length; i++) {
         let platform = platformArray[i];
         if (velocityY < 0 && doodler.y < boardHeight * 3 / 4) {
-            platform.y -= initialVelocityY; //slide platform down
+            platform.y -= initialVelocityY; // slide platform down
         }
         if (detectCollision(doodler, platform) && velocityY >= 0) {
             if (platform.type === "broken") {
-                // Skip jumping if platform is broken
-                continue;
+                continue; // Skip jump if platform is broken
             } else {
-                velocityY = initialVelocityY; //jump
+                velocityY = initialVelocityY; // jump
             }
         }
         context.drawImage(platform.img, platform.x, platform.y, platform.width, platform.height);
     }
 
     while (platformArray.length > 0 && platformArray[0].y >= boardHeight) {
-        platformArray.shift(); //removes first element from the array
-        newPlatform(); //replace with new platform on top
+        platformArray.shift(); // removes first element from the array
+        newPlatform(); // replace with new platform on top
     }
 
+    // Update score
     updateScore();
     context.fillStyle = "black";
     context.font = "16px sans-serif";
@@ -125,14 +126,14 @@ function update() {
 }
 
 function moveDoodler(e) {
-    if (e.code == "ArrowRight" || e.code == "KeyD") { //move right
+    if (e.code == "ArrowRight" || e.code == "KeyD") { // move right
         velocityX = 4;
         doodler.img = doodlerRightImg;
-    } else if (e.code == "ArrowLeft" || e.code == "KeyA") { //move left
+    } else if (e.code == "ArrowLeft" || e.code == "KeyA") { // move left
         velocityX = -4;
         doodler.img = doodlerLeftImg;
     } else if (e.code == "Space" && gameOver) {
-        //reset
+        // reset
         doodler = {
             img: doodlerRightImg,
             x: doodlerX,
@@ -153,17 +154,28 @@ function moveDoodler(e) {
 function placePlatforms() {
     platformArray = [];
 
+    // Place initial platform
+    let platform = {
+        img: platformImg,
+        x: boardWidth / 2 - platformWidth / 2,
+        y: boardHeight - platformHeight - 10,
+        width: platformWidth,
+        height: platformHeight,
+        type: "normal" // default normal platform
+    };
+    platformArray.push(platform);
+
+    // Add more platforms with random positions
     for (let i = 1; i <= 6; i++) {
-        newPlatform(); // Create platforms with randomized properties
+        newPlatform();
     }
 }
 
 function newPlatform() {
     let randomX = Math.random() * (boardWidth - platformWidth); // Random X position
-    let randomY = Math.random() * 200 + 50; // Random Y position, ensuring they start from 50px above the bottom
-
-    // Determine platform type based on score
     let platformType = "normal"; // Default platform type is normal
+
+    // Randomize platform type based on score
     if (score >= 800) {
         platformType = Math.random() < 0.5 ? "broken" : "normal"; // 50% chance for normal or broken
     } else if (score >= 300) {
@@ -175,25 +187,25 @@ function newPlatform() {
     let platform = {
         img: platformType === "broken" ? brokenPlatformImg : platformImg, // Use broken image for broken platforms
         x: randomX,
-        y: randomY,
+        y: -platformHeight, // Spawn above the board
         width: platformWidth,
         height: platformHeight,
         type: platformType // Store the platform type (normal or broken)
     };
 
-    platformArray.push(platform); // Add new platform to array
+    platformArray.push(platform); // Add the new platform to the array
 }
 
 function detectCollision(a, b) {
-    return a.x < b.x + b.width &&   
-        a.x + a.width > b.x &&   
-        a.y < b.y + b.height &&  
-        a.y + a.height > b.y;    
+    return a.x < b.x + b.width &&
+        a.x + a.width > b.x &&
+        a.y < b.y + b.height &&
+        a.y + a.height > b.y;
 }
 
 function updateScore() {
     let points = Math.floor(50 * Math.random()); //(0-1) *50 --> (0-50)
-    if (velocityY < 0) { //negative going up
+    if (velocityY < 0) { // going up
         maxScore += points;
         if (score < maxScore) {
             score = maxScore;
