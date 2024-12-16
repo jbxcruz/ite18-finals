@@ -1,8 +1,5 @@
 
 
-
-
-
 let board;
 let boardWidth = 360;
 let boardHeight = 576;
@@ -25,9 +22,11 @@ let doodler = {
 
 let velocityX = 0;
 let velocityY = 0; 
-let jumpVelocity = -6;  // Initial upward velocity for jumping
-let bounceGravity = 0.3; // Reduced gravity when going up (to make the jump faster)
-let fallGravity = 0.6;   // Increased gravity when falling (to make the fall slower)
+let jumpVelocity = -4;  // Initial upward velocity for jumping
+let maxJumpVelocity = -10;  // Max jump speed
+let jumpAcceleration = -0.1; // Increase in velocity to simulate acceleration
+let gravity = 0.4;   // Gravity to pull the player down
+let landingDeceleration = 0.05; // Slows down when landing
 
 let platformArray = [];
 let platformWidth = 60;
@@ -93,11 +92,27 @@ function update() {
         doodler.x = boardWidth;
     }
 
-    velocityY += (velocityY < 0 ? bounceGravity : fallGravity); // Adjust gravity depending on direction
+    // Apply jump acceleration (slow at first, faster after)
+    if (velocityY < maxJumpVelocity) {
+        velocityY += jumpAcceleration; // Gradually increase speed
+    }
+
+    // Apply gravity after reaching peak of jump
+    if (velocityY >= 0) {
+        velocityY += gravity; // Accelerate downwards
+    }
+
+    // Slow down when landing
+    if (velocityY > 0 && isLanding()) {
+        velocityY -= landingDeceleration; // Reduce downward velocity when landing
+    }
+
     doodler.y += velocityY;
+
     if (doodler.y > board.height) {
         gameOver = true;
     }
+
     context.drawImage(doodler.img, doodler.x, doodler.y, doodler.width, doodler.height);
 
     for (let i = 0; i < platformArray.length; i++) {
@@ -132,14 +147,14 @@ function update() {
     updateScore();
     context.fillStyle = "black";
     context.font = "16px sans-serif";
-    context.fillText(${playerName}'s Score: ${score}, 5, 20);
+    context.fillText(`${playerName}'s Score: ${score}`, 5, 20);
 
     // Display high score at the top-right corner
-    context.fillText(High Score: ${highScore}, boardWidth - 120, 20);
+    context.fillText(`High Score: ${highScore}`, boardWidth - 120, 20);
 
     if (gameOver) {
         context.fillText("Game Over: Press 'Space' to Restart", boardWidth / 7, boardHeight * 7 / 8);
-        context.fillText(Your final score is ${score}, boardWidth / 4, boardHeight / 2);
+        context.fillText(`Your final score is ${score}`, boardWidth / 4, boardHeight / 2);
     }
 }
 
@@ -167,6 +182,16 @@ function moveDoodler(e) {
         gameOver = false;
         placePlatforms();
     }
+}
+
+function isLanding() {
+    for (let platform of platformArray) {
+        if (doodler.y + doodler.height <= platform.y + 2 && 
+            detectCollision(doodler, platform) && velocityY > 0) {
+            return true; // Doodler is landing on a platform
+        }
+    }
+    return false;
 }
 
 function placePlatforms() {
