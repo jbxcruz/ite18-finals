@@ -1,5 +1,7 @@
 
 
+
+
 let board;
 let boardWidth = 360;
 let boardHeight = 576;
@@ -107,6 +109,10 @@ function update() {
         if (velocityY < 0 && doodler.y < boardHeight * 3 / 4) {
             platform.y -= initialVelocityY; // Slide platform down
         }
+
+        // Log platform info for debugging
+        console.log(`Platform ${i}: x=${platform.x}, y=${platform.y}`);
+        
         if (detectCollision(doodler, platform) && velocityY >= 0) {
             velocityY = initialVelocityY; // Jump
             if (platform.img === brokenPlatformImg) {
@@ -114,6 +120,7 @@ function update() {
                 platformArray.splice(i, 1); // Remove the broken platform from the array
             }
         }
+
         context.drawImage(platform.img, platform.x, platform.y, platform.width, platform.height);
     }
 
@@ -125,7 +132,7 @@ function update() {
     // Update score and display it with player name
     updateScore();
     context.fillStyle = "black";
-    context.font = "20px 'Gloria Hallelujah', cursive";
+    context.font = "16px sans-serif";
     context.fillText(`${playerName}'s Score: ${score}`, 5, 20);
 
     // Display high score at the top-right corner
@@ -253,13 +260,7 @@ function drawStars() {
     context.fillStyle = "white";
     for (let star of stars) {
         context.beginPath();
-        context.arc(star.x, star.y, star.radius, 0, 2 * Math.PI);
+        context.arc(star.x, star.y, star.radius, 0, Math.PI * 2);
         context.fill();
-
-        star.y += 0.5;
-        if (star.y > boardHeight) {
-            star.y = 0;
-            star.x = Math.random() * boardWidth;
-        }
     }
 }
