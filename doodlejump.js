@@ -163,7 +163,7 @@ function placePlatforms() {
     platformArray.push(platform);
 
     // Increase the number of platforms and their vertical placement variance
-    for (let i = 1; i <= 15; i++) {  // Increased the number of platforms
+    for (let i = 1; i <= 8; i++) {  // Increased the number of platforms
         let randomX = Math.random() * (boardWidth - platformWidth);
         let randomY = boardHeight - (i * 50) - Math.random() * 50; // Add random variation to vertical spacing
 
