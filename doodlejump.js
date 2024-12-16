@@ -1,5 +1,6 @@
 
 
+
 let board;
 let boardWidth = 360;
 let boardHeight = 576;
@@ -109,11 +110,14 @@ function update() {
     // Platform and collision logic
     for (let i = 0; i < platformArray.length; i++) {
         let platform = platformArray[i];
+
+        if (detectStepCollision(doodler, platform)) {
+            // Make doodler "step" onto the platform and jump
+            velocityY = jumpVelocity; // Jump
+        }
+
         if (velocityY < 0 && doodler.y < boardHeight * 3 / 4) {
             platform.y -= jumpVelocity; // Slide platform down
-        }
-        if (detectCollision(doodler, platform) && velocityY >= 0) {
-            velocityY = jumpVelocity; // Jump
         }
         context.drawImage(platform.img, platform.x, platform.y, platform.width, platform.height);
     }
@@ -203,11 +207,10 @@ function newPlatform() {
     platformArray.push(platform);
 }
 
-function detectCollision(a, b) {
-    return a.x < b.x + b.width &&   
-        a.x + a.width > b.x &&   
-        a.y < b.y + b.height &&  
-        a.y + a.height > b.y;    
+function detectStepCollision(a, b) {
+    // Check if doodler is close enough to the platform and above it, and moving downwards
+    return a.x + a.width > b.x && a.x < b.x + b.width &&
+        a.y + a.height <= b.y && a.y + a.height + velocityY >= b.y;
 }
 
 function updateScore() {
