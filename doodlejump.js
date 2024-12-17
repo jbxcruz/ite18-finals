@@ -89,17 +89,26 @@ function update() {
 
     drawStars();
 
+    // Move the doodler
     doodler.x += velocityX;
     if (doodler.x > boardWidth) doodler.x = 0;
     if (doodler.x + doodler.width < 0) doodler.x = boardWidth;
 
-    velocityY += velocityY < 0 ? bounceGravity : fallGravity;
+    // Apply gravity when falling
+    if (velocityY < 0) {
+        velocityY += bounceGravity; // Slight bounce effect when moving upwards
+    } else {
+        velocityY += fallGravity; // Gravity when falling down
+    }
+
     doodler.y += velocityY;
 
+    // Prevent character from falling off the screen
     if (doodler.y > boardHeight) gameOver = true;
 
     context.drawImage(doodler.img, doodler.x, doodler.y, doodler.width, doodler.height);
 
+    // Handle platform collision and update platform positions
     let toRemove = [];
     for (let i = 0; i < platformArray.length; i++) {
         let platform = platformArray[i];
@@ -112,7 +121,7 @@ function update() {
             if (platform.isBreakable) {
                 toRemove.push(i);
             }
-            velocityY = jumpVelocity;
+            velocityY = jumpVelocity; // Reset velocity to simulate a jump when hitting a platform
         }
 
         context.drawImage(platform.img, platform.x, platform.y, platform.width, platform.height);
@@ -223,7 +232,7 @@ function updateScore() {
 function displayText() {
     context.fillStyle = "white";
     context.font = "16px 'Gloria Hallelujah', cursive";
-    context.fillText(${playerName} ${Math.floor(score)}, 5, 20);
+    context.fillText(`${playerName} ${Math.floor(score)}`, 5, 20);
 }
 
 function displayGameOver() {
@@ -231,16 +240,16 @@ function displayGameOver() {
     context.font = "'25 px Gloria Hallelujah', cursive";
 
     // Display the High Score at the top
-    context.fillText(High Score: ${Math.floor(highScore)}, boardWidth / 2 - 100, 30);
+    context.fillText(`High Score: ${Math.floor(highScore)}`, boardWidth / 2 - 100, 30);
 
     // Display the Game Over message
     context.fillText("Game Over: Press 'Space' to Restart", boardWidth / 2 - 150, boardHeight / 2);
 
     // Display the final score
-    context.fillText(Your final score is ${Math.floor(score)}, boardWidth / 2 - 100, boardHeight * 3 / 4);
+    context.fillText(`Your final score is ${Math.floor(score)}`, boardWidth / 2 - 100, boardHeight * 3 / 4);
 
     // Display the High Score again at the bottom
-    context.fillText(High Score: ${Math.floor(highScore)}, boardWidth / 2 - 100, boardHeight * 3 / 4 + 30);
+    context.fillText(`High Score: ${Math.floor(highScore)}`, boardWidth / 2 - 100, boardHeight * 3 / 4 + 30);
 }
 
 function resetGame() {
@@ -275,9 +284,7 @@ function drawStars() {
     for (let star of stars) {
         context.fillStyle = "white";
         context.beginPath();
-        context.arc(star.x, star.y, 2, 0, 2 * Math.PI);
+        context.arc(star.x, star.y, 1.5, 0, Math.PI * 2);
         context.fill();
     }
 }
-
-
