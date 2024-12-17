@@ -184,11 +184,12 @@ function placePlatforms() {
     };
     platformArray.push(platform);
 
-    const minVerticalDistance = 80; // Reduced spacing for denser platforms
+    // Decrease vertical distance between platforms for faster spawning
+    const minVerticalDistance = 50; // Reduced spacing
     const minHorizontalSpacing = 60;
     let currentX = platform.x;
 
-    for (let i = 1; i <= 10; i++) { // Increased initial platform count
+    for (let i = 1; i <= 10; i++) { // Increase initial platform count
         let randomX = Math.random() * (boardWidth - platformWidth);
         let randomY = boardHeight - (i * minVerticalDistance) - Math.random() * 50;
 
@@ -213,18 +214,21 @@ function placePlatforms() {
 }
 
 function newPlatform() {
+    // Increase frequency by making the platforms spawn closer to each other
     let randomX = Math.random() * (boardWidth - platformWidth);
     let isBreakable = Math.random() < 0.2; // 20% chance for breakable platform
     let platform = {
         img: isBreakable ? breakablePlatformImg : platformImg,
         x: randomX,
-        y: -platformHeight / 2,
+        y: -platformHeight / 2, // Spawn just above the screen to appear quickly
         width: platformWidth,
         height: platformHeight,
         isBreakable: isBreakable
     };
     platformArray.push(platform);
 }
+
+
 
 function detectCollision(a, b) {
     return a.x < b.x + b.width &&
