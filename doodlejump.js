@@ -139,9 +139,13 @@ function moveDoodler(e) {
         velocityX = -4;
         doodler.img = doodlerLeftImg;
     } else if (e.code === "Space") {
-        resetGame();
+        if (gameOver) {
+            resetGame();
+            requestAnimationFrame(update); // Restart the game loop
+        }
     }
 }
+
 
 
 function placePlatforms() {
@@ -239,7 +243,11 @@ function resetGame() {
     velocityY = jumpVelocity;
     score = 0;
     gameOver = false;
+    lastYPosition = doodlerY;
+    platformArray = [];
+    stars = [];
     placePlatforms();
+    generateStars();
 }
 
 function generateStars() {
