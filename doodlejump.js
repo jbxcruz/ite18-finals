@@ -162,11 +162,11 @@ function placePlatforms() {
     };
     platformArray.push(platform);
 
-    const minVerticalDistance = 80; // Reduced spacing for denser platforms
+    const minVerticalDistance = 70; // Reduced spacing for denser platforms
     const minHorizontalSpacing = 60;
     let currentX = platform.x;
 
-    for (let i = 1; i <= 10; i++) { // Increased initial platform count
+    for (let i = 1; i <= 12; i++) { // Increased initial platform count
         let randomX = Math.random() * (boardWidth - platformWidth);
         let randomY = boardHeight - (i * minVerticalDistance) - Math.random() * 50;
 
@@ -174,7 +174,7 @@ function placePlatforms() {
             randomX = Math.random() * (boardWidth - platformWidth);
         }
 
-        let isBreakable = Math.random() < 0.2; // 20% chance for breakable platform
+        let isBreakable = Math.random() < 0.3; // 20% chance for breakable platform
 
         platform = {
             img: isBreakable ? breakablePlatformImg : platformImg,
@@ -192,7 +192,7 @@ function placePlatforms() {
 
 function newPlatform() {
     let randomX = Math.random() * (boardWidth - platformWidth);
-    let isBreakable = Math.random() < 0.2; // 20% chance for breakable platform
+    let isBreakable = Math.random() < 0.3; // 20% chance for breakable platform
     let platform = {
         img: isBreakable ? breakablePlatformImg : platformImg,
         x: randomX,
@@ -223,14 +223,14 @@ function updateScore() {
 }
 
 function displayText() {
-    context.fillStyle = "black";
+    context.fillStyle = "white";
     context.font = "16px sans-serif";
     context.fillText(`${playerName}'s Score: ${Math.floor(score)}`, 5, 20);
     context.fillText(`High Score: ${Math.floor(highScore)}`, boardWidth - 120, 20);
 }
 
 function displayGameOver() {
-    context.fillStyle = "red";
+    context.fillStyle = "white";
     context.font = "20px sans-serif";
 
     let gameOverText = "Game Over: Press 'Space' to Restart";
