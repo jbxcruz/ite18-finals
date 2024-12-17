@@ -41,7 +41,6 @@ let highScore = 0;
 let playerName = '';
 let lastYPosition = doodlerY;
 
-let maxYPosition = doodlerY; // Track the highest Y position the character has reached
 
 
 
@@ -237,20 +236,12 @@ function detectCollision(a, b) {
 
 
 function updateScore() {
-    // If the character is moving upwards (doodler.y decreases)
+    let scoreIncrementRate = 0.5;
     if (doodler.y < lastYPosition) {
-        // If the character has passed the highest Y position reached, increment the score
-        if (doodler.y < maxYPosition) {
-            score += 0.5; // Increase score by a fixed rate (you can adjust this)
-            maxYPosition = doodler.y; // Update the highest Y position
-        }
-        lastYPosition = doodler.y; // Update last Y position to track upward movement
+        score += scoreIncrementRate;
+        lastYPosition = doodler.y;
     }
-
-    // Update high score if necessary
-    if (score > highScore) {
-        highScore = score;
-    }
+    if (score > highScore) highScore = score;
 }
 
 
