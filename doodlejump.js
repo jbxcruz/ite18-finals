@@ -27,7 +27,7 @@ let bounceGravity = 0.2;
 let fallGravity = 0.6;
 
 let platformArray = [];
-let platformWidth = 18;
+let platformWidth = 80;
 let platformHeight = 18;
 let platformImg;
 let breakablePlatformImg;
