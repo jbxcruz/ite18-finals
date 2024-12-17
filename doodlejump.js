@@ -1,4 +1,8 @@
 
+let basePlatform; // Starting ground platform
+let hasAscended = false; // Flag to remove the base platform once the player ascends
+let platformGap = 100; // Minimum vertical distance between platforms
+
 
 let board;
 let boardWidth = 360;
@@ -74,56 +78,77 @@ window.onload = function () {
     document.addEventListener("keydown", moveDoodler);
 };
 
+
 function update() {
     requestAnimationFrame(update);
-    if (gameOver) {
-        return;
-    }
-    context.clearRect(0, 0, board.width, board.height);
+    if (gameOver) return;
 
+    context.clearRect(0, 0, board.width, board.height);
     drawStars();
 
+    // Doodler Movement and Gravity
     doodler.x += velocityX;
-    if (doodler.x > boardWidth) {
-        doodler.x = 0;
-    } else if (doodler.x + doodler.width < 0) {
-        doodler.x = boardWidth;
+    if (doodler.x > boardWidth) doodler.x = 0;
+    else if (doodler.x + doodler.width < 0) doodler.x = boardWidth;
+
+    velocityY += (velocityY < 0 ? bounceGravity : fallGravity);
+    doodler.y += velocityY;
+
+    // Remove bottom platform if the player ascends
+    if (doodler.y < boardHeight * 0.7) hasAscended = true;
+
+    if (hasAscended) {
+        platformArray = platformArray.filter(p => p !== basePlatform);
     }
 
-    velocityY += (velocityY < 0 ? bounceGravity : fallGravity); // Adjust gravity depending on direction
-    doodler.y += velocityY;
     if (doodler.y > board.height) {
         gameOver = true;
     }
+
+    // Draw Doodler
     context.drawImage(doodler.img, doodler.x, doodler.y, doodler.width, doodler.height);
 
+    // Update Platforms
     for (let i = 0; i < platformArray.length; i++) {
         let platform = platformArray[i];
 
-        if (velocityY < 0 && doodler.y < boardHeight * 3 / 4) {
-            platform.y -= jumpVelocity; // Slide platform down
+        if (velocityY < 0 && doodler.y < boardHeight * 0.5) {
+            platform.y -= jumpVelocity; // Move platforms downward when player ascends
         }
 
+        // Collision Detection
         if (detectCollision(doodler, platform) && velocityY >= 0) {
             if (platform.isBreakable) {
-                // Remove breakable platform and stop the player from jumping again
-                platformArray.splice(i, 1);
-                i--; // Adjust index because we removed an element
-                velocityY = jumpVelocity; // Reset the velocity to simulate a jump
-            } else {
-                velocityY = jumpVelocity; // Regular jump
+                platformArray.splice(i, 1); // Remove broken platform
+                i--;
             }
+            velocityY = jumpVelocity; // Jump on collision
         }
 
-        // Draw the platform
+        // Draw platform
         context.drawImage(platform.img, platform.x, platform.y, platform.width, platform.height);
     }
 
-    // Remove off-screen platforms
+    // Remove off-screen platforms and generate new ones
     while (platformArray.length > 0 && platformArray[0].y >= boardHeight) {
-        platformArray.shift(); // Removes first element from the array
-        newPlatform(); // Replace with new platform on top
+        platformArray.shift();
+        newPlatform();
     }
+
+    // Update Score
+    updateScore();
+    context.fillStyle = "white";
+    context.font = "16px sans-serif";
+    context.fillText(`${playerName}'s Score: ${score}`, 5, 20);
+    context.fillText(`High Score: ${highScore}`, boardWidth - 120, 20);
+
+    if (gameOver) {
+        context.fillText("Game Over: Press 'Space' to Restart", boardWidth / 7, boardHeight * 7 / 8);
+        context.fillText(`Your final score is ${score}`, boardWidth / 4, boardHeight / 2);
+    }
+}
+
+
 
     // Update score and display it with player name
     updateScore();
@@ -170,54 +195,54 @@ function moveDoodler(e) {
 function placePlatforms() {
     platformArray = [];
 
-    // First platform at the bottom (non-breakable)
-    let platform = {
+    // Add a solid bottom platform (base) at the start
+    basePlatform = {
         img: platformImg,
-        x: boardWidth / 2 - platformWidth / 2,
-        y: boardHeight - platformHeight - 10,
-        width: platformWidth,
-        height: platformHeight,
+        x: 0,
+        y: boardHeight - 10, // Ground platform at the very bottom
+        width: boardWidth,
+        height: 10, // Thin ground
         isBreakable: false
     };
-    platformArray.push(platform);
+    platformArray.push(basePlatform);
 
-    // Generate 6 additional platforms
-    for (let i = 1; i <= 6; i++) {
+    // Generate additional platforms
+    let currentY = boardHeight - 100; // Start positioning from the bottom
+    for (let i = 0; i < 6; i++) {
         let randomX = Math.random() * (boardWidth - platformWidth);
-        let randomY = boardHeight - (i * 100); // Even spacing vertically
+        let isBreakable = Math.random() < 0.2; // 20% chance for breakable platform
 
-        let isBreakable = Math.random() < 0.2; // 20% chance for breakable platforms
-
-        platform = {
+        let platform = {
             img: isBreakable ? breakablePlatformImg : platformImg,
             x: randomX,
-            y: randomY,
+            y: currentY,
             width: platformWidth,
             height: platformHeight,
             isBreakable: isBreakable
         };
+
         platformArray.push(platform);
+        currentY -= platformGap + Math.random() * 30; // Adjust Y spacing with randomness
     }
 }
 
 
 
+
 function newPlatform() {
-    let randomX = Math.random() * (boardWidth - platformWidth); // Random X position
-
-    let isBreakable = Math.random() < 0.2; // 20% chance to be breakable
-
+    let randomX = Math.random() * (boardWidth - platformWidth);
+    let isBreakable = Math.random() < 0.2; // 20% chance for broken platform
     let platform = {
         img: isBreakable ? breakablePlatformImg : platformImg,
         x: randomX,
-        y: -platformHeight, // Start above the visible screen
+        y: -platformHeight, // Start off-screen
         width: platformWidth,
         height: platformHeight,
         isBreakable: isBreakable
     };
-
     platformArray.push(platform);
 }
+
 
 
 function detectCollision(a, b) {
