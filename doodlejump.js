@@ -138,7 +138,7 @@ function moveDoodler(e) {
     } else if (e.code === "ArrowLeft" || e.code === "KeyA") {
         velocityX = -4;
         doodler.img = doodlerLeftImg;
-    } else if (e.code === "Space" && gameOver) {
+    } else if (e.code === "Space") {
         resetGame();
     }
 }
