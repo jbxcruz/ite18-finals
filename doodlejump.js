@@ -229,13 +229,13 @@ function updateScore() {
 
 function displayText() {
     context.fillStyle = "white";
-    context.font = "16px sans-serif";
+    context.font = "16px 'Gloria Hallelujah', cursive";
     context.fillText(`${playerName} ${Math.floor(score)}`, 5, 20);
 }
 
 function displayGameOver() {
-    context.fillStyle = "red";
-    context.font = "20px sans-serif";
+    context.fillStyle = "white";
+    context.font = "'25 px Gloria Hallelujah', cursive";
     
     // Display the High Score at the top
     context.fillText(`High Score: ${Math.floor(highScore)}`, boardWidth / 2 - 100, 30);
