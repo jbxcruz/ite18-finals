@@ -80,9 +80,6 @@ window.onload = function () {
     document.addEventListener("keydown", moveDoodler);
 };
 
-let cameraOffset = 0;
-let screenCenterY = boardHeight / 2; // This is the center of the screen
-
 function update() {
     if (gameOver) return;
 
@@ -91,6 +88,7 @@ function update() {
 
     drawStars();
 
+    // Move the character and adjust screen
     doodler.x += velocityX;
     if (doodler.x > boardWidth) doodler.x = 0;
     if (doodler.x + doodler.width < 0) doodler.x = boardWidth;
@@ -109,17 +107,17 @@ function update() {
     // Stop the character from going off-screen vertically
     if (doodler.y > boardHeight) gameOver = true;
 
+    // Draw the character
     context.drawImage(doodler.img, doodler.x, doodler.y - cameraOffset, doodler.width, doodler.height);
 
     let toRemove = [];
     for (let i = 0; i < platformArray.length; i++) {
         let platform = platformArray[i];
 
-        // Platforms move when the player jumps (so that they stay on-screen)
-        if (velocityY < -1 && doodler.y < boardHeight * 4 / 4) {
-            platform.y -= jumpVelocity;
-        }
+        // Move platforms down (falling effect)
+        platform.y += 2; // Adjust falling speed if needed
 
+        // If the platform is within collision range, handle collision
         if (detectCollision(doodler, platform) && velocityY >= 0) {
             if (platform.isBreakable) {
                 toRemove.push(i);
@@ -127,14 +125,16 @@ function update() {
             velocityY = jumpVelocity;
         }
 
-        // Adjust platform drawing position based on camera offset
+        // Adjust platform position based on camera offset
         context.drawImage(platform.img, platform.x, platform.y - cameraOffset, platform.width, platform.height);
     }
 
+    // Remove platforms that have gone off-screen
     for (let index of toRemove) {
         platformArray.splice(index, 1);
     }
 
+    // If the platform goes off the screen, spawn a new one
     while (platformArray.length > 0 && platformArray[0].y >= boardHeight) {
         platformArray.shift();
         newPlatform();
@@ -147,6 +147,7 @@ function update() {
         displayGameOver();
     }
 }
+
 
 
 
