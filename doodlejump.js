@@ -80,6 +80,9 @@ window.onload = function () {
     document.addEventListener("keydown", moveDoodler);
 };
 
+let cameraOffset = 0;
+let screenCenterY = boardHeight / 2; // This is the center of the screen
+
 function update() {
     if (gameOver) return;
 
@@ -92,25 +95,27 @@ function update() {
     if (doodler.x > boardWidth) doodler.x = 0;
     if (doodler.x + doodler.width < 0) doodler.x = boardWidth;
 
-    // Update the velocity and position of the doodler
     velocityY += velocityY < 0 ? bounceGravity : fallGravity;
+    doodler.y += velocityY;
 
-    // Prevent the character from going off-screen when jumping upwards
-    if (doodler.y + velocityY < 0) {
-        velocityY = 0; // Stop the upward motion
-        doodler.y = 0; // Set the Y position to 0 (top of the screen)
-    } else {
-        doodler.y += velocityY;
+    // Move the camera to keep the character centered vertically
+    let targetY = doodler.y - cameraOffset;
+    if (targetY < screenCenterY) {
+        cameraOffset = doodler.y - screenCenterY; // Shift the camera upwards
+    } else if (doodler.y > screenCenterY) {
+        cameraOffset = doodler.y - screenCenterY; // Stop the camera if the character reaches the center
     }
 
+    // Stop the character from going off-screen vertically
     if (doodler.y > boardHeight) gameOver = true;
 
-    context.drawImage(doodler.img, doodler.x, doodler.y, doodler.width, doodler.height);
+    context.drawImage(doodler.img, doodler.x, doodler.y - cameraOffset, doodler.width, doodler.height);
 
     let toRemove = [];
     for (let i = 0; i < platformArray.length; i++) {
         let platform = platformArray[i];
 
+        // Platforms move when the player jumps (so that they stay on-screen)
         if (velocityY < -1 && doodler.y < boardHeight * 4 / 4) {
             platform.y -= jumpVelocity;
         }
@@ -122,7 +127,8 @@ function update() {
             velocityY = jumpVelocity;
         }
 
-        context.drawImage(platform.img, platform.x, platform.y, platform.width, platform.height);
+        // Adjust platform drawing position based on camera offset
+        context.drawImage(platform.img, platform.x, platform.y - cameraOffset, platform.width, platform.height);
     }
 
     for (let index of toRemove) {
@@ -141,6 +147,7 @@ function update() {
         displayGameOver();
     }
 }
+
 
 
 
