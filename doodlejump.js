@@ -131,6 +131,9 @@ function update() {
     }
 }
 
+
+
+// Modify the moveDoodler function for restart logic
 function moveDoodler(e) {
     if (e.code === "ArrowRight" || e.code === "KeyD") {
         velocityX = 4;
@@ -138,10 +141,48 @@ function moveDoodler(e) {
     } else if (e.code === "ArrowLeft" || e.code === "KeyA") {
         velocityX = -4;
         doodler.img = doodlerLeftImg;
-    } else if (e.code === "Space" && gameOver) {
-        resetGame();
+    } else if (e.code === "Space") {
+        if (gameOver) {
+            resetGame(); // Restart the game properly
+        }
     }
 }
+
+// Modify displayGameOver function to center the text
+function displayGameOver() {
+    context.fillStyle = "red";
+    context.font = "20px sans-serif";
+    context.textAlign = "center"; // Center text horizontally
+
+    // Display messages in the center of the canvas
+    context.fillText("Game Over! Press 'Space' to Restart", boardWidth / 2, boardHeight / 2 - 20);
+    context.fillText(`Your final score: ${Math.floor(score)}`, boardWidth / 2, boardHeight / 2 + 10);
+}
+
+// Modify resetGame function to reset all variables
+function resetGame() {
+    doodler.x = doodlerX;
+    doodler.y = doodlerY;
+    velocityX = 0;
+    velocityY = jumpVelocity;
+    platformArray = [];
+    score = 0;
+    lastYPosition = doodlerY;
+    gameOver = false;
+
+    // Place platforms and reset stars
+    placePlatforms();
+    generateStars();
+
+    // Ensure doodler image is reset
+    doodler.img = doodlerRightImg;
+
+    // Restart the game loop
+    requestAnimationFrame(update);
+}
+
+
+
 
 function placePlatforms() {
     platformArray = [];
