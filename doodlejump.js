@@ -160,11 +160,11 @@ function placePlatforms() {
     };
     platformArray.push(platform);
 
-    const minVerticalDistance = 100;
-    const minHorizontalSpacing = 70;
+    const minVerticalDistance = 80; // Reduced spacing for denser platforms
+    const minHorizontalSpacing = 60;
     let currentX = platform.x;
 
-    for (let i = 1; i <= 6; i++) {
+    for (let i = 1; i <= 10; i++) { // Increased initial platform count
         let randomX = Math.random() * (boardWidth - platformWidth);
         let randomY = boardHeight - (i * minVerticalDistance) - Math.random() * 50;
 
@@ -172,7 +172,7 @@ function placePlatforms() {
             randomX = Math.random() * (boardWidth - platformWidth);
         }
 
-        let isBreakable = Math.random() < 0.2;
+        let isBreakable = Math.random() < 0.2; // 20% chance for breakable platform
 
         platform = {
             img: isBreakable ? breakablePlatformImg : platformImg,
@@ -190,16 +190,19 @@ function placePlatforms() {
 
 function newPlatform() {
     let randomX = Math.random() * (boardWidth - platformWidth);
+    let isBreakable = Math.random() < 0.2; // 20% chance for breakable platform
     let platform = {
-        img: platformImg,
+        img: isBreakable ? breakablePlatformImg : platformImg,
         x: randomX,
         y: -platformHeight / 2,
         width: platformWidth,
         height: platformHeight,
-        isBreakable: false
+        isBreakable: isBreakable
     };
     platformArray.push(platform);
 }
+
+
 
 function detectCollision(a, b) {
     return a.x < b.x + b.width &&
@@ -227,9 +230,17 @@ function displayText() {
 function displayGameOver() {
     context.fillStyle = "red";
     context.font = "20px sans-serif";
-    context.fillText("Game Over: Press 'Space' to Restart", boardWidth / 2, boardHeight / 2);
-    context.fillText(`Your final score is ${Math.floor(score)}`, boardWidth / 2, boardHeight * 3 / 4);
+
+    let gameOverText = "Game Over: Press 'Space' to Restart";
+    let scoreText = `Your final score is ${Math.floor(score)}`;
+
+    let gameOverTextWidth = context.measureText(gameOverText).width;
+    let scoreTextWidth = context.measureText(scoreText).width;
+
+    context.fillText(gameOverText, (boardWidth - gameOverTextWidth) / 2, boardHeight / 2);
+    context.fillText(scoreText, (boardWidth - scoreTextWidth) / 2, boardHeight / 2 + 30);
 }
+
 
 function resetGame() {
     doodler = {
