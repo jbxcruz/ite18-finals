@@ -27,7 +27,7 @@ let bounceGravity = 0.2;
 let fallGravity = 0.6;
 
 let platformArray = [];
-let platformWidth = 100;
+let platformWidth = 18;
 let platformHeight = 18;
 let platformImg;
 let breakablePlatformImg;
@@ -100,7 +100,7 @@ function update() {
     for (let i = 0; i < platformArray.length; i++) {
         let platform = platformArray[i];
 
-        if (velocityY < 0 && doodler.y < boardHeight * 3 / 4) {
+        if (velocityY < 0 && doodler.y < boardHeight * 2 / 4) {
             platform.y -= jumpVelocity;
         }
 
