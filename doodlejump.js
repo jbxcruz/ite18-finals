@@ -220,7 +220,7 @@ function detectCollision(a, b) {
 
 function updateScore() {
     let scoreIncrementRate = 0.5;
-    if (doodler.y < lastYPosition) {
+    if (doodler.y <= lastYPosition) {
         score += scoreIncrementRate;
         lastYPosition = doodler.y;
     }
