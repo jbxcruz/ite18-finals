@@ -42,6 +42,11 @@ let highScore = 0;
 let playerName = '';
 let lastYPosition = doodlerY;
 
+let cameraY = 0; // Camera offset
+const cameraSpeed = 2; // Adjust how fast the camera moves with the doodler
+
+
+
 window.onload = function () {
     // Prompt for the player's name and limit to 8 characters
     playerName = prompt("Enter your name (Max 8 characters):");
@@ -86,18 +91,34 @@ function update() {
     requestAnimationFrame(update);
     context.clearRect(0, 0, board.width, board.height);
 
+    // Adjust the camera position based on doodler's vertical position
+    if (doodler.y < boardHeight / 2) {
+        cameraY = doodler.y - boardHeight / 2; // Follow the doodler upwards
+    }
+
+    // Ensure the camera doesn't go below the bottom of the game
+    if (cameraY > 0) cameraY = 0;
+
+    // Draw the stars and move them relative to the camera
     drawStars();
 
+    // Move the doodler (adjusted by camera)
     doodler.x += velocityX;
     if (doodler.x > boardWidth) doodler.x = 0;
     if (doodler.x + doodler.width < 0) doodler.x = boardWidth;
 
-    velocityY += velocityY < 0 ? bounceGravity : fallGravity;
+    if (velocityY < 0) {
+        velocityY += bounceGravity; // Slight bounce effect
+    } else {
+        velocityY += fallGravity; // Gravity effect
+    }
+
     doodler.y += velocityY;
 
     if (doodler.y > boardHeight) gameOver = true;
 
-    context.drawImage(doodler.img, doodler.x, doodler.y, doodler.width, doodler.height);
+    // Draw the doodler (position adjusted by camera)
+    context.drawImage(doodler.img, doodler.x, doodler.y - cameraY, doodler.width, doodler.height);
 
     let toRemove = [];
     for (let i = 0; i < platformArray.length; i++) {
@@ -114,13 +135,15 @@ function update() {
             velocityY = jumpVelocity;
         }
 
-        context.drawImage(platform.img, platform.x, platform.y, platform.width, platform.height);
+        // Adjust platform position based on camera
+        context.drawImage(platform.img, platform.x, platform.y - cameraY, platform.width, platform.height);
     }
 
     for (let index of toRemove) {
         platformArray.splice(index, 1);
     }
 
+    // Add new platforms as necessary
     while (platformArray.length > 0 && platformArray[0].y >= boardHeight) {
         platformArray.shift();
         newPlatform();
