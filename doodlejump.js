@@ -1,4 +1,5 @@
 
+
 let board;
 let boardWidth = 360;
 let boardHeight = 576;
@@ -221,7 +222,7 @@ function updateScore() {
 function displayText() {
     context.fillStyle = "white";
     context.font = "16px 'Gloria Hallelujah', cursive";
-    context.fillText(${playerName} ${Math.floor(score)}, 5, 20);
+    context.fillText(`${playerName} ${Math.floor(score)}`, 5, 20);
 }
 
 function displayGameOver() {
@@ -229,16 +230,16 @@ function displayGameOver() {
     context.font = "'25 px Gloria Hallelujah', cursive";
 
     // Display the High Score at the top
-    context.fillText(High Score: ${Math.floor(highScore)}, boardWidth / 2 - 100, 30);
+    context.fillText(`High Score: ${Math.floor(highScore)}`, boardWidth / 2 - 100, 30);
 
     // Display the Game Over message
     context.fillText("Game Over: Press 'Space' to Restart", boardWidth / 2 - 150, boardHeight / 2);
 
     // Display the final score
-    context.fillText(Your final score is ${Math.floor(score)}, boardWidth / 2 - 100, boardHeight * 3 / 4);
+    context.fillText(`Your final score is ${Math.floor(score)}`, boardWidth / 2 - 100, boardHeight * 3 / 4);
 
     // Display the High Score again at the bottom
-    context.fillText(High Score: ${Math.floor(highScore)}, boardWidth / 2 - 100, boardHeight * 3 / 4 + 30);
+    context.fillText(`High Score: ${Math.floor(highScore)}`, boardWidth / 2 - 100, boardHeight * 3 / 4 + 30);
 }
 
 function resetGame() {
@@ -260,8 +261,6 @@ function resetGame() {
     generateStars();
 }
 
-
-
 function generateStars() {
     for (let i = 0; i < numStars; i++) {
         stars.push({
@@ -279,5 +278,3 @@ function drawStars() {
         context.fill();
     }
 }
-
-
