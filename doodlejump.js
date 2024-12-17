@@ -152,6 +152,8 @@ function moveDoodler(e) {
 
 function placePlatforms() {
     platformArray = [];
+    
+    // Create initial platform at the bottom
     let platform = {
         img: platformImg,
         x: boardWidth / 2 - platformWidth / 2,
@@ -162,23 +164,26 @@ function placePlatforms() {
     };
     platformArray.push(platform);
 
-    const minVerticalDistance = 100; // Minimum y-axis spacing
-    const maxVerticalDistance = 150; // Maximum y-axis spacing
-    const minHorizontalSpacing = 70; // Minimum x-axis spacing
-    let currentX = platform.x;
-    let currentY = platform.y;
+    // Define minimum and maximum distances
+    const minVerticalDistance = 100;  // Min distance between platforms vertically
+    const maxVerticalDistance = 150;  // Max distance between platforms vertically
+    const minHorizontalSpacing = 70;  // Min horizontal distance
+    const maxHorizontalSpacing = 150; // Max horizontal distance
 
+    let lastPlatformX = platform.x;
+    let lastPlatformY = platform.y;
+
+    // Create the next platforms
     for (let i = 1; i <= 6; i++) {
-        // Randomize vertical spacing
-        let randomY = currentY - (Math.random() * (maxVerticalDistance - minVerticalDistance) + minVerticalDistance);
+        let randomY = lastPlatformY - (Math.random() * (maxVerticalDistance - minVerticalDistance) + minVerticalDistance);
         
-        // Randomize horizontal position with spacing
+        // Randomize horizontal position within a range but ensure enough spacing
         let randomX = Math.random() * (boardWidth - platformWidth);
-        while (Math.abs(currentX - randomX) < minHorizontalSpacing) {
+        while (Math.abs(lastPlatformX - randomX) < minHorizontalSpacing || Math.abs(lastPlatformX - randomX) > maxHorizontalSpacing) {
             randomX = Math.random() * (boardWidth - platformWidth);
         }
 
-        // Add breakable platforms with 20% probability
+        // 20% chance for breakable platforms
         let isBreakable = Math.random() < 0.2;
 
         platform = {
@@ -191,67 +196,43 @@ function placePlatforms() {
         };
 
         platformArray.push(platform);
-        currentX = randomX;
-        currentY = randomY;
-    }
-}
-
-
-
-function placePlatforms() {
-    platformArray = [];
-    let platform = {
-        img: platformImg,
-        x: boardWidth / 2 - platformWidth / 2,
-        y: boardHeight - platformHeight - 8,
-        width: platformWidth,
-        height: platformHeight,
-        isBreakable: false
-    };
-    platformArray.push(platform);
-
-    const minVerticalDistance = 80; // Reduced spacing for denser platforms
-    const minHorizontalSpacing = 60;
-    let currentX = platform.x;
-
-    for (let i = 1; i <= 10; i++) { // Increased initial platform count
-        let randomX = Math.random() * (boardWidth - platformWidth);
-        let randomY = boardHeight - (i * minVerticalDistance) - Math.random() * 80;
-
-        while (Math.abs(currentX - randomX) < minHorizontalSpacing) {
-            randomX = Math.random() * (boardWidth - platformWidth);
-        }
-
-        let isBreakable = Math.random() < 0.3; // 20% chance for breakable platform
-
-        platform = {
-            img: isBreakable ? breakablePlatformImg : platformImg,
-            x: randomX,
-            y: randomY,
-            width: platformWidth,
-            height: platformHeight,
-            isBreakable: isBreakable
-        };
-
-        platformArray.push(platform);
-        currentX = randomX;
+        lastPlatformX = randomX;
+        lastPlatformY = randomY;
     }
 }
 
 function newPlatform() {
+    const minVerticalDistance = 100;
+    const maxVerticalDistance = 150;
+    const minHorizontalSpacing = 70;
+    const maxHorizontalSpacing = 150;
+
+    let lastPlatform = platformArray[platformArray.length - 1];
+    let lastY = lastPlatform ? lastPlatform.y : boardHeight;
+
+    // Randomize vertical position with no large gaps
+    let randomY = lastY - (Math.random() * (maxVerticalDistance - minVerticalDistance) + minVerticalDistance);
+
+    // Randomize horizontal position within a range but ensure enough spacing
     let randomX = Math.random() * (boardWidth - platformWidth);
-    let isBreakable = Math.random() < 0.3; // 20% chance for breakable platform
+    while (lastPlatform && Math.abs(lastPlatform.x - randomX) < minHorizontalSpacing || Math.abs(lastPlatform.x - randomX) > maxHorizontalSpacing) {
+        randomX = Math.random() * (boardWidth - platformWidth);
+    }
+
+    // 20% chance for breakable platforms
+    let isBreakable = Math.random() < 0.2;
+
     let platform = {
         img: isBreakable ? breakablePlatformImg : platformImg,
         x: randomX,
-        y: -platformHeight / 2,
+        y: randomY,
         width: platformWidth,
         height: platformHeight,
         isBreakable: isBreakable
     };
+
     platformArray.push(platform);
 }
-
 
 
 
