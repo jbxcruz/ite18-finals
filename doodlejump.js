@@ -216,17 +216,21 @@ function placePlatforms() {
 
 function newPlatform() {
     let randomX = Math.random() * (boardWidth - platformWidth); // Random X position
+
+    let isBreakable = Math.random() < 0.2; // 20% chance to be breakable
+
     let platform = {
-        img: platformImg,
+        img: isBreakable ? breakablePlatformImg : platformImg,
         x: randomX,
-        y: -platformHeight, 
+        y: -platformHeight, // Start above the visible screen
         width: platformWidth,
         height: platformHeight,
-        isBreakable: false
+        isBreakable: isBreakable
     };
 
     platformArray.push(platform);
 }
+
 
 function detectCollision(a, b) {
     return a.x < b.x + b.width &&   
@@ -235,20 +239,23 @@ function detectCollision(a, b) {
         a.y + a.height > b.y;    
 }
 
+
+
+let highestY = doodlerY; // Track the highest Y position reached
+
 function updateScore() {
-    // Increase the score when the player is going upwards
-    if (doodler.y < lastYPosition) {
-        score += 1; // Increment the score as the player goes up
-        maxScore = score > maxScore ? score : maxScore; // Track max score during the game session
+    if (doodler.y < highestY) { // Player is moving upwards
+        score += Math.floor(highestY - doodler.y); // Increment score based on upward progress
+        highestY = doodler.y; // Update the highest Y position
     }
 
     // Update high score if current score exceeds it
     if (score > highScore) {
         highScore = score;
     }
-
-    lastYPosition = doodler.y; // Update last Y position for the next frame
 }
+
+
 
 function generateStars() {
     for (let i = 0; i < numStars; i++) {
