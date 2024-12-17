@@ -27,7 +27,7 @@ let bounceGravity = 0.2;
 let fallGravity = 0.6;
 
 let platformArray = [];
-let platformWidth = 80;
+let platformWidth = 100;
 let platformHeight = 18;
 let platformImg;
 let breakablePlatformImg;
@@ -197,37 +197,61 @@ function placePlatforms() {
 }
 
 
-function newPlatform() {
-    const minVerticalDistance = 100;
-    const maxVerticalDistance = 150;
-    const minHorizontalSpacing = 70;
 
-    let lastPlatform = platformArray[platformArray.length - 1];
-    let lastY = lastPlatform ? lastPlatform.y : boardHeight;
+function placePlatforms() {
+    platformArray = [];
+    let platform = {
+        img: platformImg,
+        x: boardWidth / 2 - platformWidth / 2,
+        y: boardHeight - platformHeight - 8,
+        width: platformWidth,
+        height: platformHeight,
+        isBreakable: false
+    };
+    platformArray.push(platform);
 
-    // Randomize the new platform's vertical position
-    let randomY = lastY - (Math.random() * (maxVerticalDistance - minVerticalDistance) + minVerticalDistance);
+    const minVerticalDistance = 80; // Reduced spacing for denser platforms
+    const minHorizontalSpacing = 60;
+    let currentX = platform.x;
 
-    // Randomize horizontal position with spacing
-    let randomX = Math.random() * (boardWidth - platformWidth);
-    while (lastPlatform && Math.abs(lastPlatform.x - randomX) < minHorizontalSpacing) {
-        randomX = Math.random() * (boardWidth - platformWidth);
+    for (let i = 1; i <= 10; i++) { // Increased initial platform count
+        let randomX = Math.random() * (boardWidth - platformWidth);
+        let randomY = boardHeight - (i * minVerticalDistance) - Math.random() * 80;
+
+        while (Math.abs(currentX - randomX) < minHorizontalSpacing) {
+            randomX = Math.random() * (boardWidth - platformWidth);
+        }
+
+        let isBreakable = Math.random() < 0.3; // 20% chance for breakable platform
+
+        platform = {
+            img: isBreakable ? breakablePlatformImg : platformImg,
+            x: randomX,
+            y: randomY,
+            width: platformWidth,
+            height: platformHeight,
+            isBreakable: isBreakable
+        };
+
+        platformArray.push(platform);
+        currentX = randomX;
     }
+}
 
-    // Add breakable platforms with 20% probability
-    let isBreakable = Math.random() < 0.2;
-
+function newPlatform() {
+    let randomX = Math.random() * (boardWidth - platformWidth);
+    let isBreakable = Math.random() < 0.3; // 20% chance for breakable platform
     let platform = {
         img: isBreakable ? breakablePlatformImg : platformImg,
         x: randomX,
-        y: randomY,
+        y: -platformHeight / 2,
         width: platformWidth,
         height: platformHeight,
         isBreakable: isBreakable
     };
-
     platformArray.push(platform);
 }
+
 
 
 
