@@ -1,4 +1,5 @@
 
+
 let board;
 let boardWidth = 360;
 let boardHeight = 576;
@@ -41,10 +42,6 @@ let highScore = 0;
 let playerName = '';
 let lastYPosition = doodlerY;
 
-
-
-
-
 window.onload = function () {
     // Prompt for the player's name and limit to 8 characters
     playerName = prompt("Enter your name (Max 8 characters):");
@@ -82,10 +79,6 @@ window.onload = function () {
 
     document.addEventListener("keydown", moveDoodler);
 };
-
-
-
-
 
 function update() {
     if (gameOver) return;
@@ -141,10 +134,6 @@ function update() {
     }
 }
 
-
-
-
-    
 function moveDoodler(e) {
     if (e.code === "ArrowRight" || e.code === "KeyD") {
         velocityX = 4;
@@ -159,10 +148,6 @@ function moveDoodler(e) {
         }
     }
 }
-
-
-
-
 
 function placePlatforms() {
     platformArray = [];
@@ -204,10 +189,6 @@ function placePlatforms() {
     }
 }
 
-
-
-
-
 function newPlatform() {
     let randomX = Math.random() * (boardWidth - platformWidth);
     let isBreakable = Math.random() < 0.2; // 20% chance for breakable platform
@@ -222,18 +203,12 @@ function newPlatform() {
     platformArray.push(platform);
 }
 
-
-
-
 function detectCollision(a, b) {
     return a.x < b.x + b.width &&
         a.x + a.width > b.x &&
         a.y < b.y + b.height &&
         a.y + a.height > b.y;
 }
-
-
-
 
 function updateScore() {
     let scoreIncrementRate = 0.5;
@@ -244,23 +219,16 @@ function updateScore() {
     if (score > highScore) highScore = score;
 }
 
-
-
-
-
 function displayText() {
     context.fillStyle = "white";
     context.font = "16px 'Gloria Hallelujah', cursive";
     context.fillText(`${playerName} ${Math.floor(score)}`, 5, 20);
 }
 
-
-
-
 function displayGameOver() {
     context.fillStyle = "white";
     context.font = "'25 px Gloria Hallelujah', cursive";
-    
+
     // Display the High Score at the top
     context.fillText(`High Score: ${Math.floor(highScore)}`, boardWidth / 2 - 100, 30);
 
@@ -273,10 +241,6 @@ function displayGameOver() {
     // Display the High Score again at the bottom
     context.fillText(`High Score: ${Math.floor(highScore)}`, boardWidth / 2 - 100, boardHeight * 3 / 4 + 30);
 }
-
-
-
-
 
 function resetGame() {
     doodler = {
@@ -296,12 +260,6 @@ function resetGame() {
     placePlatforms();
     generateStars();
 }
-
-
-
-
-
-
 
 function generateStars() {
     for (let i = 0; i < numStars; i++) {
