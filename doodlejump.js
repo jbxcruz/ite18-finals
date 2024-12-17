@@ -224,22 +224,25 @@ function updateScore() {
 function displayText() {
     context.fillStyle = "white";
     context.font = "16px sans-serif";
-    context.fillText(`${playerName}'s Score: ${Math.floor(score)}`, 5, 20);
+    context.fillText(`${playerName} ${Math.floor(score)}`, 5, 20);
     context.fillText(`High Score: ${Math.floor(highScore)}`, boardWidth - 120, 20);
 }
 
 function displayGameOver() {
-    context.fillStyle = "white";
+    context.fillStyle = "red";
     context.font = "20px sans-serif";
+    
+    // Display the High Score at the top
+    context.fillText(`High Score: ${Math.floor(highScore)}`, boardWidth / 2 - 100, 30);
 
-    let gameOverText = "Game Over: Press 'Space' to Restart";
-    let scoreText = `Your final score is ${Math.floor(score)}`;
+    // Display the Game Over message
+    context.fillText("Game Over: Press 'Space' to Restart", boardWidth / 2 - 150, boardHeight / 2);
 
-    let gameOverTextWidth = context.measureText(gameOverText).width;
-    let scoreTextWidth = context.measureText(scoreText).width;
+    // Display the final score
+    context.fillText(`Your final score is ${Math.floor(score)}`, boardWidth / 2 - 100, boardHeight * 3 / 4);
 
-    context.fillText(gameOverText, (boardWidth - gameOverTextWidth) / 2, boardHeight / 2);
-    context.fillText(scoreText, (boardWidth - scoreTextWidth) / 2, boardHeight / 2 + 30);
+    // Display the High Score again at the bottom
+    context.fillText(`High Score: ${Math.floor(highScore)}`, boardWidth / 2 - 100, boardHeight * 3 / 4 + 30);
 }
 
 
@@ -261,6 +264,8 @@ function resetGame() {
     placePlatforms();
     generateStars();
 }
+
+
 
 function generateStars() {
     for (let i = 0; i < numStars; i++) {
