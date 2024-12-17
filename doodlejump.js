@@ -104,17 +104,12 @@ function update() {
             platform.y -= jumpVelocity;
         }
 
-        
-    if (detectCollision(doodler, platform) && velocityY >= 0) {
-        if (platform.isBreakable) {
-            // Break the platform and let the character fall
-            platformArray.splice(i, 1); // Remove the platform immediately
-        } else {
-            // Regular platform: bounce the character up
+        if (detectCollision(doodler, platform) && velocityY >= 0) {
+            if (platform.isBreakable) {
+                toRemove.push(i);
+            }
             velocityY = jumpVelocity;
         }
-    }
-
 
         context.drawImage(platform.img, platform.x, platform.y, platform.width, platform.height);
     }
