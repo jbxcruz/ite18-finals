@@ -43,7 +43,7 @@ let playerName = '';
 let lastYPosition = doodlerY;
 
 window.onload = function () {
-    playerName = prompt("Enter your name:") || "Player";
+    playerName = prompt("Enter your name:") || " ";
     board = document.getElementById("board");
     board.height = boardHeight;
     board.width = boardWidth;
