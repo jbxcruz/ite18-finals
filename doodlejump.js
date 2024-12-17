@@ -1,4 +1,5 @@
 
+let screenScrollSpeed = 8; // Speed at which the screen shifts upwards
 
 
 let board;
@@ -77,6 +78,7 @@ window.onload = function () {
     document.addEventListener("keydown", moveDoodler);
 };
 
+
 function update() {
     if (gameOver) return;
 
@@ -101,7 +103,7 @@ function update() {
         let platform = platformArray[i];
 
         if (velocityY < 0 && doodler.y < boardHeight * 3 / 4) {
-            platform.y -= jumpVelocity;
+            platform.y -= screenScrollSpeed; // Faster upward movement
         }
 
         if (detectCollision(doodler, platform) && velocityY >= 0) {
@@ -130,6 +132,7 @@ function update() {
         displayGameOver();
     }
 }
+
 
 function moveDoodler(e) {
     if (e.code === "ArrowRight" || e.code === "KeyD") {
