@@ -24,7 +24,7 @@ let doodler = {
 let velocityX = 0;
 let velocityY = 0;
 let jumpVelocity = -6;
-let bounceGravity = 0.6;
+let bounceGravity = 0.2;
 let fallGravity = 0.6;
 
 let platformArray = [];
