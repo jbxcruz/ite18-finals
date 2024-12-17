@@ -100,7 +100,7 @@ function update() {
     for (let i = 0; i < platformArray.length; i++) {
         let platform = platformArray[i];
 
-        if (velocityY < 0 && doodler.y < boardHeight * 3 / 4) {
+        if (velocityY < 0 && doodler.y < boardHeight * 4 / 4) {
             platform.y -= jumpVelocity;
         }
 
