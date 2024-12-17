@@ -1,6 +1,7 @@
 
 
 
+
 let board;
 let boardWidth = 360;
 let boardHeight = 576;
@@ -42,7 +43,6 @@ let gameOver = false;
 let highScore = 0;
 let playerName = '';
 let lastYPosition = doodlerY;
-let offsetY = 0; // Variable to control screen scrolling
 
 window.onload = function () {
     // Prompt for the player's name and limit to 8 characters
@@ -90,7 +90,6 @@ function update() {
 
     drawStars();
 
-    // Move the doodler
     doodler.x += velocityX;
     if (doodler.x > boardWidth) doodler.x = 0;
     if (doodler.x + doodler.width < 0) doodler.x = boardWidth;
@@ -98,18 +97,9 @@ function update() {
     velocityY += velocityY < 0 ? bounceGravity : fallGravity;
     doodler.y += velocityY;
 
-    // Prevent character from going out of bounds and center the view around the character
     if (doodler.y > boardHeight) gameOver = true;
 
-    // Scroll the screen to keep the character around the middle
-    if (doodler.y < boardHeight / 2) {
-        offsetY = Math.min(offsetY + Math.abs(velocityY), doodler.y); // Avoid scrolling beyond the top
-    } else {
-        offsetY = Math.max(offsetY - Math.abs(velocityY), 0); // Avoid scrolling below the bottom
-    }
-
-    // Draw the doodler
-    context.drawImage(doodler.img, doodler.x, doodler.y - offsetY, doodler.width, doodler.height);
+    context.drawImage(doodler.img, doodler.x, doodler.y, doodler.width, doodler.height);
 
     let toRemove = [];
     for (let i = 0; i < platformArray.length; i++) {
@@ -126,7 +116,7 @@ function update() {
             velocityY = jumpVelocity;
         }
 
-        context.drawImage(platform.img, platform.x, platform.y - offsetY, platform.width, platform.height);
+        context.drawImage(platform.img, platform.x, platform.y, platform.width, platform.height);
     }
 
     for (let index of toRemove) {
@@ -163,22 +153,23 @@ function moveDoodler(e) {
 
 function placePlatforms() {
     platformArray = [];
-    const minVerticalDistance = 80; // Reduced spacing for denser platforms
-    const minHorizontalSpacing = 60;
-    let currentX = boardWidth / 2 - platformWidth / 2;
     let platform = {
         img: platformImg,
-        x: currentX,
-        y: 0, // Start at the top of the screen
+        x: boardWidth / 2 - platformWidth / 2,
+        y: boardHeight - platformHeight - 10,
         width: platformWidth,
         height: platformHeight,
         isBreakable: false
     };
     platformArray.push(platform);
 
-    for (let i = 1; i <= 10; i++) {
+    const minVerticalDistance = 80; // Reduced spacing for denser platforms
+    const minHorizontalSpacing = 60;
+    let currentX = platform.x;
+
+    for (let i = 1; i <= 10; i++) { // Increased initial platform count
         let randomX = Math.random() * (boardWidth - platformWidth);
-        let randomY = i * minVerticalDistance;
+        let randomY = boardHeight - (i * minVerticalDistance) - Math.random() * 50;
 
         while (Math.abs(currentX - randomX) < minHorizontalSpacing) {
             randomX = Math.random() * (boardWidth - platformWidth);
@@ -233,7 +224,7 @@ function updateScore() {
 function displayText() {
     context.fillStyle = "white";
     context.font = "16px 'Gloria Hallelujah', cursive";
-    context.fillText(`${playerName} ${Math.floor(score)}`, 5, 20);
+    context.fillText(${playerName} ${Math.floor(score)}, 5, 20);
 }
 
 function displayGameOver() {
@@ -241,16 +232,16 @@ function displayGameOver() {
     context.font = "'25 px Gloria Hallelujah', cursive";
 
     // Display the High Score at the top
-    context.fillText(`High Score: ${Math.floor(highScore)}`, boardWidth / 2 - 100, 30);
+    context.fillText(High Score: ${Math.floor(highScore)}, boardWidth / 2 - 100, 30);
 
     // Display the Game Over message
     context.fillText("Game Over: Press 'Space' to Restart", boardWidth / 2 - 150, boardHeight / 2);
 
     // Display the final score
-    context.fillText(`Your final score is ${Math.floor(score)}`, boardWidth / 2 - 100, boardHeight * 3 / 4);
+    context.fillText(Your final score is ${Math.floor(score)}, boardWidth / 2 - 100, boardHeight * 3 / 4);
 
     // Display the High Score again at the bottom
-    context.fillText(`High Score: ${Math.floor(highScore)}`, boardWidth / 2 - 100, boardHeight * 3 / 4 + 30);
+    context.fillText(High Score: ${Math.floor(highScore)}, boardWidth / 2 - 100, boardHeight * 3 / 4 + 30);
 }
 
 function resetGame() {
@@ -268,7 +259,6 @@ function resetGame() {
     lastYPosition = doodlerY;
     platformArray = [];
     stars = [];
-    offsetY = 0;
     placePlatforms();
     generateStars();
 }
@@ -290,3 +280,5 @@ function drawStars() {
         context.fill();
     }
 }
+
+
