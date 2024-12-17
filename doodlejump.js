@@ -1,7 +1,4 @@
 
-
-
-
 let board;
 let boardWidth = 360;
 let boardHeight = 576;
@@ -262,6 +259,8 @@ function resetGame() {
     placePlatforms();
     generateStars();
 }
+
+
 
 function generateStars() {
     for (let i = 0; i < numStars; i++) {
