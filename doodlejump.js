@@ -1,5 +1,6 @@
 
 
+
 let board;
 let boardWidth = 360;
 let boardHeight = 576;
@@ -88,7 +89,6 @@ function update() {
 
     drawStars();
 
-    // Move the character and adjust screen
     doodler.x += velocityX;
     if (doodler.x > boardWidth) doodler.x = 0;
     if (doodler.x + doodler.width < 0) doodler.x = boardWidth;
@@ -96,28 +96,18 @@ function update() {
     velocityY += velocityY < 0 ? bounceGravity : fallGravity;
     doodler.y += velocityY;
 
-    // Move the camera to keep the character centered vertically
-    let targetY = doodler.y - cameraOffset;
-    if (targetY < screenCenterY) {
-        cameraOffset = doodler.y - screenCenterY; // Shift the camera upwards
-    } else if (doodler.y > screenCenterY) {
-        cameraOffset = doodler.y - screenCenterY; // Stop the camera if the character reaches the center
-    }
-
-    // Stop the character from going off-screen vertically
     if (doodler.y > boardHeight) gameOver = true;
 
-    // Draw the character
-    context.drawImage(doodler.img, doodler.x, doodler.y - cameraOffset, doodler.width, doodler.height);
+    context.drawImage(doodler.img, doodler.x, doodler.y, doodler.width, doodler.height);
 
     let toRemove = [];
     for (let i = 0; i < platformArray.length; i++) {
         let platform = platformArray[i];
 
-        // Move platforms down (falling effect)
-        platform.y += 2; // Adjust falling speed if needed
+        if (velocityY < -1 && doodler.y < boardHeight * 4 / 4) {
+            platform.y -= jumpVelocity;
+        }
 
-        // If the platform is within collision range, handle collision
         if (detectCollision(doodler, platform) && velocityY >= 0) {
             if (platform.isBreakable) {
                 toRemove.push(i);
@@ -125,16 +115,13 @@ function update() {
             velocityY = jumpVelocity;
         }
 
-        // Adjust platform position based on camera offset
-        context.drawImage(platform.img, platform.x, platform.y - cameraOffset, platform.width, platform.height);
+        context.drawImage(platform.img, platform.x, platform.y, platform.width, platform.height);
     }
 
-    // Remove platforms that have gone off-screen
     for (let index of toRemove) {
         platformArray.splice(index, 1);
     }
 
-    // If the platform goes off the screen, spawn a new one
     while (platformArray.length > 0 && platformArray[0].y >= boardHeight) {
         platformArray.shift();
         newPlatform();
@@ -147,10 +134,6 @@ function update() {
         displayGameOver();
     }
 }
-
-
-
-
 
 function moveDoodler(e) {
     if (e.code === "ArrowRight" || e.code === "KeyD") {
@@ -208,43 +191,18 @@ function placePlatforms() {
 }
 
 function newPlatform() {
-    // Spawn platforms just above the top of the screen
-    let randomX = Math.random() * (boardWidth - platformWidth); // Random horizontal position
+    let randomX = Math.random() * (boardWidth - platformWidth);
     let isBreakable = Math.random() < 0.2; // 20% chance for breakable platform
-
     let platform = {
         img: isBreakable ? breakablePlatformImg : platformImg,
         x: randomX,
-        y: -platformHeight, // Spawn above the screen
+        y: -platformHeight / 2,
         width: platformWidth,
         height: platformHeight,
         isBreakable: isBreakable
     };
-
     platformArray.push(platform);
 }
-
-function placePlatforms() {
-    platformArray = [];
-    // Place initial platforms at the top of the screen
-    const numInitialPlatforms = 10; // Number of initial platforms
-    for (let i = 0; i < numInitialPlatforms; i++) {
-        let randomX = Math.random() * (boardWidth - platformWidth); // Random horizontal position
-        let isBreakable = Math.random() < 0.2; // 20% chance for breakable platform
-
-        let platform = {
-            img: isBreakable ? breakablePlatformImg : platformImg,
-            x: randomX,
-            y: -platformHeight * (i + 1), // Start above the screen
-            width: platformWidth,
-            height: platformHeight,
-            isBreakable: isBreakable
-        };
-
-        platformArray.push(platform);
-    }
-}
-
 
 function detectCollision(a, b) {
     return a.x < b.x + b.width &&
