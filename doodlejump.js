@@ -42,6 +42,7 @@ let gameOver = false;
 let highScore = 0;
 let playerName = '';
 let lastYPosition = doodlerY;
+let offsetY = 0; // Variable to control screen scrolling
 
 window.onload = function () {
     // Prompt for the player's name and limit to 8 characters
@@ -89,6 +90,7 @@ function update() {
 
     drawStars();
 
+    // Move the doodler
     doodler.x += velocityX;
     if (doodler.x > boardWidth) doodler.x = 0;
     if (doodler.x + doodler.width < 0) doodler.x = boardWidth;
@@ -96,9 +98,18 @@ function update() {
     velocityY += velocityY < 0 ? bounceGravity : fallGravity;
     doodler.y += velocityY;
 
+    // Prevent character from going out of bounds and center the view around the character
     if (doodler.y > boardHeight) gameOver = true;
 
-    context.drawImage(doodler.img, doodler.x, doodler.y, doodler.width, doodler.height);
+    // Scroll the screen to keep the character around the middle
+    if (doodler.y < boardHeight / 2) {
+        offsetY = Math.min(offsetY + Math.abs(velocityY), doodler.y); // Avoid scrolling beyond the top
+    } else {
+        offsetY = Math.max(offsetY - Math.abs(velocityY), 0); // Avoid scrolling below the bottom
+    }
+
+    // Draw the doodler
+    context.drawImage(doodler.img, doodler.x, doodler.y - offsetY, doodler.width, doodler.height);
 
     let toRemove = [];
     for (let i = 0; i < platformArray.length; i++) {
@@ -115,7 +126,7 @@ function update() {
             velocityY = jumpVelocity;
         }
 
-        context.drawImage(platform.img, platform.x, platform.y, platform.width, platform.height);
+        context.drawImage(platform.img, platform.x, platform.y - offsetY, platform.width, platform.height);
     }
 
     for (let index of toRemove) {
@@ -152,23 +163,22 @@ function moveDoodler(e) {
 
 function placePlatforms() {
     platformArray = [];
+    const minVerticalDistance = 80; // Reduced spacing for denser platforms
+    const minHorizontalSpacing = 60;
+    let currentX = boardWidth / 2 - platformWidth / 2;
     let platform = {
         img: platformImg,
-        x: boardWidth / 2 - platformWidth / 2,
-        y: boardHeight - platformHeight - 10,
+        x: currentX,
+        y: 0, // Start at the top of the screen
         width: platformWidth,
         height: platformHeight,
         isBreakable: false
     };
     platformArray.push(platform);
 
-    const minVerticalDistance = 80; // Reduced spacing for denser platforms
-    const minHorizontalSpacing = 60;
-    let currentX = platform.x;
-
-    for (let i = 1; i <= 10; i++) { // Increased initial platform count
+    for (let i = 1; i <= 10; i++) {
         let randomX = Math.random() * (boardWidth - platformWidth);
-        let randomY = boardHeight - (i * minVerticalDistance) - Math.random() * 50;
+        let randomY = i * minVerticalDistance;
 
         while (Math.abs(currentX - randomX) < minHorizontalSpacing) {
             randomX = Math.random() * (boardWidth - platformWidth);
@@ -258,6 +268,7 @@ function resetGame() {
     lastYPosition = doodlerY;
     platformArray = [];
     stars = [];
+    offsetY = 0;
     placePlatforms();
     generateStars();
 }
