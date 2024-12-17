@@ -225,7 +225,6 @@ function displayText() {
     context.fillStyle = "white";
     context.font = "16px sans-serif";
     context.fillText(`${playerName} ${Math.floor(score)}`, 5, 20);
-    context.fillText(`High Score: ${Math.floor(highScore)}`, boardWidth - 120, 20);
 }
 
 function displayGameOver() {
