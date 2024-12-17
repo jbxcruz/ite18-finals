@@ -42,8 +42,14 @@ let highScore = 0;
 let playerName = '';
 let lastYPosition = doodlerY;
 
+
+
 window.onload = function () {
-    playerName = prompt("Enter your name:") || " ";
+    // Prompt for the player's name and limit to 8 characters
+    playerName = prompt("Enter your name (Max 8 characters):");
+    playerName = playerName ? playerName.substring(0, 8) : "Player"; // Limit to 8 characters
+
+    // Your existing board and game setup code follows
     board = document.getElementById("board");
     board.height = boardHeight;
     board.width = boardWidth;
