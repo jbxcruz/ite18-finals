@@ -208,18 +208,43 @@ function placePlatforms() {
 }
 
 function newPlatform() {
-    let randomX = Math.random() * (boardWidth - platformWidth);
+    // Spawn platforms just above the top of the screen
+    let randomX = Math.random() * (boardWidth - platformWidth); // Random horizontal position
     let isBreakable = Math.random() < 0.2; // 20% chance for breakable platform
+
     let platform = {
         img: isBreakable ? breakablePlatformImg : platformImg,
         x: randomX,
-        y: -platformHeight / 2,
+        y: -platformHeight, // Spawn above the screen
         width: platformWidth,
         height: platformHeight,
         isBreakable: isBreakable
     };
+
     platformArray.push(platform);
 }
+
+function placePlatforms() {
+    platformArray = [];
+    // Place initial platforms at the top of the screen
+    const numInitialPlatforms = 10; // Number of initial platforms
+    for (let i = 0; i < numInitialPlatforms; i++) {
+        let randomX = Math.random() * (boardWidth - platformWidth); // Random horizontal position
+        let isBreakable = Math.random() < 0.2; // 20% chance for breakable platform
+
+        let platform = {
+            img: isBreakable ? breakablePlatformImg : platformImg,
+            x: randomX,
+            y: -platformHeight * (i + 1), // Start above the screen
+            width: platformWidth,
+            height: platformHeight,
+            isBreakable: isBreakable
+        };
+
+        platformArray.push(platform);
+    }
+}
+
 
 function detectCollision(a, b) {
     return a.x < b.x + b.width &&
