@@ -42,15 +42,10 @@ let highScore = 0;
 let playerName = '';
 let lastYPosition = doodlerY;
 
-let cameraY = 0; // Camera offset
-const cameraSpeed = 2; // Adjust how fast the camera moves with the doodler
-
-
-
 window.onload = function () {
     // Prompt for the player's name and limit to 8 characters
     playerName = prompt("Enter your name (Max 8 characters):");
-    playerName = playerName ? playerName.substring(0, 8) : "Player"; // Limit to 8 characters
+    playerName = playerName ? playerName.substring(0, 😎 : "Player"; // Limit to 8 characters
 
     // Your existing board and game setup code follows
     board = document.getElementById("board");
@@ -91,34 +86,18 @@ function update() {
     requestAnimationFrame(update);
     context.clearRect(0, 0, board.width, board.height);
 
-    // Adjust the camera position based on doodler's vertical position
-    if (doodler.y < boardHeight / 2) {
-        cameraY = doodler.y - boardHeight / 2; // Follow the doodler upwards
-    }
-
-    // Ensure the camera doesn't go below the bottom of the game
-    if (cameraY > 0) cameraY = 0;
-
-    // Draw the stars and move them relative to the camera
     drawStars();
 
-    // Move the doodler (adjusted by camera)
     doodler.x += velocityX;
     if (doodler.x > boardWidth) doodler.x = 0;
     if (doodler.x + doodler.width < 0) doodler.x = boardWidth;
 
-    if (velocityY < 0) {
-        velocityY += bounceGravity; // Slight bounce effect
-    } else {
-        velocityY += fallGravity; // Gravity effect
-    }
-
+    velocityY += velocityY < 0 ? bounceGravity : fallGravity;
     doodler.y += velocityY;
 
     if (doodler.y > boardHeight) gameOver = true;
 
-    // Draw the doodler (position adjusted by camera)
-    context.drawImage(doodler.img, doodler.x, doodler.y - cameraY, doodler.width, doodler.height);
+    context.drawImage(doodler.img, doodler.x, doodler.y, doodler.width, doodler.height);
 
     let toRemove = [];
     for (let i = 0; i < platformArray.length; i++) {
@@ -135,15 +114,13 @@ function update() {
             velocityY = jumpVelocity;
         }
 
-        // Adjust platform position based on camera
-        context.drawImage(platform.img, platform.x, platform.y - cameraY, platform.width, platform.height);
+        context.drawImage(platform.img, platform.x, platform.y, platform.width, platform.height);
     }
 
     for (let index of toRemove) {
         platformArray.splice(index, 1);
     }
 
-    // Add new platforms as necessary
     while (platformArray.length > 0 && platformArray[0].y >= boardHeight) {
         platformArray.shift();
         newPlatform();
@@ -184,12 +161,11 @@ function placePlatforms() {
     };
     platformArray.push(platform);
 
-    // Decrease vertical distance between platforms for faster spawning
-    const minVerticalDistance = 50; // Reduced spacing
+    const minVerticalDistance = 80; // Reduced spacing for denser platforms
     const minHorizontalSpacing = 60;
     let currentX = platform.x;
 
-    for (let i = 1; i <= 10; i++) { // Increase initial platform count
+    for (let i = 1; i <= 10; i++) { // Increased initial platform count
         let randomX = Math.random() * (boardWidth - platformWidth);
         let randomY = boardHeight - (i * minVerticalDistance) - Math.random() * 50;
 
@@ -214,21 +190,18 @@ function placePlatforms() {
 }
 
 function newPlatform() {
-    // Increase frequency by making the platforms spawn closer to each other
     let randomX = Math.random() * (boardWidth - platformWidth);
     let isBreakable = Math.random() < 0.2; // 20% chance for breakable platform
     let platform = {
         img: isBreakable ? breakablePlatformImg : platformImg,
         x: randomX,
-        y: -platformHeight / 2, // Spawn just above the screen to appear quickly
+        y: -platformHeight / 2,
         width: platformWidth,
         height: platformHeight,
         isBreakable: isBreakable
     };
     platformArray.push(platform);
 }
-
-
 
 function detectCollision(a, b) {
     return a.x < b.x + b.width &&
@@ -249,7 +222,7 @@ function updateScore() {
 function displayText() {
     context.fillStyle = "white";
     context.font = "16px 'Gloria Hallelujah', cursive";
-    context.fillText(`${playerName} ${Math.floor(score)}`, 5, 20);
+    context.fillText(${playerName} ${Math.floor(score)}, 5, 20);
 }
 
 function displayGameOver() {
@@ -257,16 +230,16 @@ function displayGameOver() {
     context.font = "'25 px Gloria Hallelujah', cursive";
 
     // Display the High Score at the top
-    context.fillText(`High Score: ${Math.floor(highScore)}`, boardWidth / 2 - 100, 30);
+    context.fillText(High Score: ${Math.floor(highScore)}, boardWidth / 2 - 100, 30);
 
     // Display the Game Over message
     context.fillText("Game Over: Press 'Space' to Restart", boardWidth / 2 - 150, boardHeight / 2);
 
     // Display the final score
-    context.fillText(`Your final score is ${Math.floor(score)}`, boardWidth / 2 - 100, boardHeight * 3 / 4);
+    context.fillText(Your final score is ${Math.floor(score)}, boardWidth / 2 - 100, boardHeight * 3 / 4);
 
     // Display the High Score again at the bottom
-    context.fillText(`High Score: ${Math.floor(highScore)}`, boardWidth / 2 - 100, boardHeight * 3 / 4 + 30);
+    context.fillText(High Score: ${Math.floor(highScore)}, boardWidth / 2 - 100, boardHeight * 3 / 4 + 30);
 }
 
 function resetGame() {
