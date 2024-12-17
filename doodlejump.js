@@ -1,6 +1,4 @@
 
-let screenScrollSpeed = 8; // Speed at which the screen shifts upwards
-
 
 let board;
 let boardWidth = 360;
