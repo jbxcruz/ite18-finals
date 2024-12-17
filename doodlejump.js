@@ -1,4 +1,5 @@
 
+
 let board;
 let boardWidth = 360;
 let boardHeight = 576;
@@ -21,9 +22,9 @@ let doodler = {
 
 let velocityX = 0;
 let velocityY = 0;
-let jumpVelocity = -6;
-let bounceGravity = 0.3;
-let fallGravity = 0.6;
+let jumpVelocity = -6;  // Initial upward velocity for jumping
+let bounceGravity = 0.3; // Reduced gravity when going up (to make the jump faster)
+let fallGravity = 0.6;   // Increased gravity when falling (to make the fall slower)
 
 let platformArray = [];
 let platformWidth = 60;
@@ -31,21 +32,24 @@ let platformHeight = 18;
 let platformImg;
 
 let breakablePlatformImg = new Image();
-breakablePlatformImg.src = "./platform-broken.png";
+breakablePlatformImg.src = "./platform-broken.png"; // Image for breakable platforms
 
 let stars = [];
 let numStars = 100;
 
 let score = 0;
-let highScore = 0;
-let maxYPosition = doodlerY; // Track the maximum Y position the player reaches
+let maxScore = 0;
 let gameOver = false;
+let highScore = 0; // Track high score
+let playerName = ''; // Store player's name
+let lastYPosition = doodlerY; // Track the last Y position to detect upward movement
 
 window.onload = function () {
+    playerName = prompt("Enter your name:"); // Ask for the player's name
     board = document.getElementById("board");
     board.height = boardHeight;
     board.width = boardWidth;
-    context = board.getContext("2d");
+    context = board.getContext("2d"); 
 
     board.style.margin = "auto";
     board.style.display = "block";
@@ -53,6 +57,9 @@ window.onload = function () {
     doodlerRightImg = new Image();
     doodlerRightImg.src = "./doodler-right.png";
     doodler.img = doodlerRightImg;
+    doodlerRightImg.onload = function () {
+        context.drawImage(doodler.img, doodler.x, doodler.y, doodler.width, doodler.height);
+    };
 
     doodlerLeftImg = new Image();
     doodlerLeftImg.src = "./doodler-left.png";
@@ -61,7 +68,7 @@ window.onload = function () {
     platformImg.src = "./platform.png";
 
     velocityY = jumpVelocity;
-    placeInitialPlatforms();
+    placePlatforms();
     generateStars();
     requestAnimationFrame(update);
     document.addEventListener("keydown", moveDoodler);
@@ -69,135 +76,175 @@ window.onload = function () {
 
 function update() {
     requestAnimationFrame(update);
-    if (gameOver) return;
-
+    if (gameOver) {
+        return;
+    }
     context.clearRect(0, 0, board.width, board.height);
+
     drawStars();
 
     doodler.x += velocityX;
-    if (doodler.x > boardWidth) doodler.x = 0;
-    else if (doodler.x + doodler.width < 0) doodler.x = boardWidth;
+    if (doodler.x > boardWidth) {
+        doodler.x = 0;
+    } else if (doodler.x + doodler.width < 0) {
+        doodler.x = boardWidth;
+    }
 
-    // Apply gravity
-    velocityY += (velocityY < 0 ? bounceGravity : fallGravity);
+    velocityY += (velocityY < 0 ? bounceGravity : fallGravity); // Adjust gravity depending on direction
     doodler.y += velocityY;
-
-    // Check if doodler falls off the screen
-    if (doodler.y > board.height) gameOver = true;
-
+    if (doodler.y > board.height) {
+        gameOver = true;
+    }
     context.drawImage(doodler.img, doodler.x, doodler.y, doodler.width, doodler.height);
 
     for (let i = 0; i < platformArray.length; i++) {
         let platform = platformArray[i];
 
-        // Move platforms down if player ascends
         if (velocityY < 0 && doodler.y < boardHeight * 3 / 4) {
-            platform.y -= jumpVelocity;
+            platform.y -= jumpVelocity; // Slide platform down
         }
 
         if (detectCollision(doodler, platform) && velocityY >= 0) {
             if (platform.isBreakable) {
+                // Remove breakable platform and stop the player from jumping again
                 platformArray.splice(i, 1);
-                i--;
+                i--; // Adjust index because we removed an element
+                velocityY = jumpVelocity; // Reset the velocity to simulate a jump
+            } else {
+                velocityY = jumpVelocity; // Regular jump
             }
-            velocityY = jumpVelocity; // Bounce up
         }
 
-        // Draw platforms
+        // Draw the platform
         context.drawImage(platform.img, platform.x, platform.y, platform.width, platform.height);
     }
 
-    // Remove off-screen platforms and generate new ones
+    // Remove off-screen platforms
     while (platformArray.length > 0 && platformArray[0].y >= boardHeight) {
-        platformArray.shift();
-        generateNewPlatform();
+        platformArray.shift(); // Removes first element from the array
+        newPlatform(); // Replace with new platform on top
     }
 
+    // Update score and display it with player name
     updateScore();
-    displayScores();
+    context.fillStyle = "white";
+    context.font = "16px sans-serif";
+    context.fillText(${playerName}'s Score: ${score}, 5, 20);
 
-    if (gameOver) displayGameOver();
+    // Display high score at the top-right corner
+    context.fillText(High Score: ${highScore}, boardWidth - 120, 20);
+
+    if (gameOver) {
+        context.fillText("Game Over: Press 'Space' to Restart", boardWidth / 7, boardHeight * 7 / 8);
+        context.fillText(Your final score is ${score}, boardWidth / 4, boardHeight / 2);
+    }
 }
 
 function moveDoodler(e) {
-    if (e.code === "ArrowRight" || e.code === "KeyD") {
+    if (e.code == "ArrowRight" || e.code == "KeyD") { // Move right
         velocityX = 4;
         doodler.img = doodlerRightImg;
-    } else if (e.code === "ArrowLeft" || e.code === "KeyA") {
+    } else if (e.code == "ArrowLeft" || e.code == "KeyA") { // Move left
         velocityX = -4;
         doodler.img = doodlerLeftImg;
-    } else if (e.code === "Space" && gameOver) {
-        resetGame();
+    } else if (e.code == "Space" && gameOver) {
+        // Reset
+        doodler = {
+            img: doodlerRightImg,
+            x: doodlerX,
+            y: doodlerY,
+            width: doodlerWidth,
+            height: doodlerHeight
+        };
+
+        velocityX = 0;
+        velocityY = jumpVelocity;
+        score = 0;
+        maxScore = 0;
+        gameOver = false;
+        placePlatforms();
     }
 }
 
-function placeInitialPlatforms() {
+function placePlatforms() {
     platformArray = [];
-    let initialY = boardHeight - platformHeight - 10;
 
-    for (let i = 0; i < 7; i++) {
-        let platform = {
-            img: platformImg,
-            x: Math.random() * (boardWidth - platformWidth),
-            y: initialY - i * 100,
+    // First platform at the bottom (non-breakable)
+    let platform = {
+        img: platformImg,
+        x: boardWidth / 2 - platformWidth / 2,
+        y: boardHeight - platformHeight - 10,
+        width: platformWidth,
+        height: platformHeight,
+        isBreakable: false
+    };
+    platformArray.push(platform);
+
+    // Generate 6 additional platforms
+    for (let i = 1; i <= 7; i++) {
+        let randomX = Math.random() * (boardWidth - platformWidth);
+        let randomY = boardHeight - (i * 100); // Even spacing vertically
+
+        let isBreakable = Math.random() < 0.4; // 20% chance for breakable platforms
+
+        platform = {
+            img: isBreakable ? breakablePlatformImg : platformImg,
+            x: randomX,
+            y: randomY,
             width: platformWidth,
             height: platformHeight,
-            isBreakable: false
+            isBreakable: isBreakable
         };
         platformArray.push(platform);
     }
 }
 
-function generateNewPlatform() {
-    let isBreakable = Math.random() < 0.2; // 20% chance of breakable platform
+
+
+function newPlatform() {
+    let randomX = Math.random() * (boardWidth - platformWidth); // Random X position
+
+    let isBreakable = Math.random() < 0.2; // 20% chance to be breakable
+
     let platform = {
         img: isBreakable ? breakablePlatformImg : platformImg,
-        x: Math.random() * (boardWidth - platformWidth),
-        y: -platformHeight,
+        x: randomX,
+        y: -platformHeight, // Start above the visible screen
         width: platformWidth,
         height: platformHeight,
         isBreakable: isBreakable
     };
+
     platformArray.push(platform);
 }
 
+
+
+
 function detectCollision(a, b) {
-    return a.x < b.x + b.width && a.x + a.width > b.x && a.y < b.y + b.height && a.y + a.height > b.y;
+    return a.x < b.x + b.width &&   
+        a.x + a.width > b.x &&   
+        a.y < b.y + b.height &&  
+        a.y + a.height > b.y;    
 }
 
+
+let highestY = doodlerY; // Track the highest Y position reached
+
 function updateScore() {
-    if (doodler.y < maxYPosition) {
-        score += Math.round(maxYPosition - doodler.y); // Only increase when moving upwards
-        maxYPosition = doodler.y;
+    if (doodler.y < highestY) { // Player is moving upwards
+        score += Math.floor(highestY - doodler.y); // Increment score based on upward progress
+        highestY = doodler.y; // Update the highest Y position
+    }
+
+    // Update high score if current score exceeds it
+    if (score > highScore) {
+        highScore = score;
     }
 }
 
-function displayScores() {
-    context.fillStyle = "white";
-    context.font = "16px Arial";
-    context.fillText(`Score: ${score}`, 5, 20);
-    context.fillText(`High Score: ${highScore}`, boardWidth - 120, 20);
 
-    if (score > highScore) highScore = score;
-}
 
-function displayGameOver() {
-    context.fillStyle = "red";
-    context.font = "20px Arial";
-    context.fillText("Game Over: Press 'Space' to Restart", boardWidth / 8, boardHeight / 2);
-    context.fillText(`Your Final Score: ${score}`, boardWidth / 3.5, boardHeight / 2 + 30);
-}
-
-function resetGame() {
-    doodler.x = boardWidth / 2 - doodlerWidth / 2;
-    doodler.y = boardHeight * 7 / 8 - doodlerHeight;
-    velocityX = 0;
-    velocityY = jumpVelocity;
-    score = 0;
-    maxYPosition = doodler.y;
-    gameOver = false;
-    placeInitialPlatforms();
-}
 
 function generateStars() {
     for (let i = 0; i < numStars; i++) {
@@ -209,12 +256,11 @@ function generateStars() {
 }
 
 function drawStars() {
-    for (let star of stars) {
+    for (let i = 0; i < stars.length; i++) {
+        let star = stars[i];
         context.fillStyle = "white";
         context.beginPath();
         context.arc(star.x, star.y, 2, 0, 2 * Math.PI);
         context.fill();
     }
 }
-
-
