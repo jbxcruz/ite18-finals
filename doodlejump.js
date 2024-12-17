@@ -1,3 +1,4 @@
+let maxYPosition = doodlerY; // Track the highest Y position the character has reached
 
 
 let board;
@@ -44,6 +45,7 @@ let lastYPosition = doodlerY;
 
 
 
+
 window.onload = function () {
     // Prompt for the player's name and limit to 8 characters
     playerName = prompt("Enter your name (Max 8 characters):");
@@ -81,6 +83,9 @@ window.onload = function () {
 
     document.addEventListener("keydown", moveDoodler);
 };
+
+
+
 
 
 function update() {
@@ -138,6 +143,8 @@ function update() {
 }
 
 
+
+
     
 function moveDoodler(e) {
     if (e.code === "ArrowRight" || e.code === "KeyD") {
@@ -153,6 +160,9 @@ function moveDoodler(e) {
         }
     }
 }
+
+
+
 
 
 function placePlatforms() {
@@ -195,6 +205,10 @@ function placePlatforms() {
     }
 }
 
+
+
+
+
 function newPlatform() {
     let randomX = Math.random() * (boardWidth - platformWidth);
     let isBreakable = Math.random() < 0.2; // 20% chance for breakable platform
@@ -211,6 +225,7 @@ function newPlatform() {
 
 
 
+
 function detectCollision(a, b) {
     return a.x < b.x + b.width &&
         a.x + a.width > b.x &&
@@ -218,20 +233,38 @@ function detectCollision(a, b) {
         a.y + a.height > b.y;
 }
 
+
+
+
 function updateScore() {
-    let scoreIncrementRate = 0.5;
-    if (doodler.y <= lastYPosition) {
-        score += scoreIncrementRate;
-        lastYPosition = doodler.y;
+    // If the character is moving upwards (doodler.y decreases)
+    if (doodler.y < lastYPosition) {
+        // If the character has passed the highest Y position reached, increment the score
+        if (doodler.y < maxYPosition) {
+            score += 0.5; // Increase score by a fixed rate (you can adjust this)
+            maxYPosition = doodler.y; // Update the highest Y position
+        }
+        lastYPosition = doodler.y; // Update last Y position to track upward movement
     }
-    if (score > highScore) highScore = score;
+
+    // Update high score if necessary
+    if (score > highScore) {
+        highScore = score;
+    }
 }
+
+
+
+
 
 function displayText() {
     context.fillStyle = "white";
     context.font = "16px 'Gloria Hallelujah', cursive";
     context.fillText(`${playerName} ${Math.floor(score)}`, 5, 20);
 }
+
+
+
 
 function displayGameOver() {
     context.fillStyle = "white";
@@ -249,6 +282,9 @@ function displayGameOver() {
     // Display the High Score again at the bottom
     context.fillText(`High Score: ${Math.floor(highScore)}`, boardWidth / 2 - 100, boardHeight * 3 / 4 + 30);
 }
+
+
+
 
 
 function resetGame() {
@@ -269,6 +305,10 @@ function resetGame() {
     placePlatforms();
     generateStars();
 }
+
+
+
+
 
 
 
