@@ -101,6 +101,7 @@ function update() {
         let platform = platformArray[i];
 
         if (velocityY < 0 && doodler.y < boardHeight * 3 / 4) {
+            platform.y -= jumpVelocity;
             platform.y -= screenScrollSpeed; // Faster upward movement
         }
 
@@ -126,12 +127,8 @@ function update() {
     updateScore();
     displayText();
 
-    if (gameOver) {
-        displayGameOver();
-    }
-}
 
-
+    
 function moveDoodler(e) {
     if (e.code === "ArrowRight" || e.code === "KeyD") {
         velocityX = 4;
