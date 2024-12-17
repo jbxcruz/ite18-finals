@@ -1,5 +1,6 @@
 
 
+
 let board;
 let boardWidth = 360;
 let boardHeight = 576;
@@ -127,7 +128,7 @@ function update() {
 
     // Update score and display it with player name
     updateScore();
-    context.fillStyle = "white";
+    context.fillStyle = "black";
     context.font = "16px sans-serif";
     context.fillText(${playerName}'s Score: ${score}, 5, 20);
 
@@ -169,57 +170,64 @@ function moveDoodler(e) {
 function placePlatforms() {
     platformArray = [];
 
-    // First platform at the bottom (non-breakable)
+    // First platform at the bottom
     let platform = {
         img: platformImg,
-        x: boardWidth / 2 - platformWidth / 2,
-        y: boardHeight - platformHeight - 10,
+        x: boardWidth / 2 - platformWidth / 2, // Center platform horizontally
+        y: boardHeight - platformHeight - 10,  // Place it just above the bottom edge
         width: platformWidth,
         height: platformHeight,
         isBreakable: false
     };
     platformArray.push(platform);
 
-    // Generate 6 additional platforms
-    for (let i = 1; i <= 7; i++) {
-        let randomX = Math.random() * (boardWidth - platformWidth);
-        let randomY = boardHeight - (i * 100); // Even spacing vertically
+    // Define a minimum vertical distance between platforms
+    const minVerticalDistance = 100;
+    const minHorizontalSpacing = 70; // Minimum horizontal spacing between platforms
 
-        let isBreakable = Math.random() < 0.4; // 20% chance for breakable platforms
+    // Generate 6 additional platforms, ensuring even distribution
+    let currentX = platform.x; // Start with the first platform's X position
+    let yOffset = minVerticalDistance; // Initial vertical offset
+
+    for (let i = 1; i <= 6; i++) {
+        let randomX = Math.random() * (boardWidth - platformWidth); // Random X position
+        let randomY = boardHeight - (i * minVerticalDistance) - Math.random() * 50; // Random Y position within the bounds
+
+        // Ensure platforms are evenly spaced horizontally
+        while (Math.abs(currentX - randomX) < minHorizontalSpacing) {
+            randomX = Math.random() * (boardWidth - platformWidth); // Randomize again if too close
+        }
+
+        // 20% chance for the platform to be breakable
+        let isBreakable = Math.random() < 0.2;
 
         platform = {
-            img: isBreakable ? breakablePlatformImg : platformImg,
+            img: isBreakable ? breakablePlatformImg : platformImg,  // Use breakable platform image if isBreakable is true
             x: randomX,
             y: randomY,
             width: platformWidth,
             height: platformHeight,
             isBreakable: isBreakable
         };
+
         platformArray.push(platform);
+        currentX = randomX; // Update currentX for next platform
     }
 }
 
-
-
 function newPlatform() {
     let randomX = Math.random() * (boardWidth - platformWidth); // Random X position
-
-    let isBreakable = Math.random() < 0.2; // 20% chance to be breakable
-
     let platform = {
-        img: isBreakable ? breakablePlatformImg : platformImg,
+        img: platformImg,
         x: randomX,
-        y: -platformHeight, // Start above the visible screen
+        y: -platformHeight, 
         width: platformWidth,
         height: platformHeight,
-        isBreakable: isBreakable
+        isBreakable: false
     };
 
     platformArray.push(platform);
 }
-
-
-
 
 function detectCollision(a, b) {
     return a.x < b.x + b.width &&   
@@ -228,23 +236,20 @@ function detectCollision(a, b) {
         a.y + a.height > b.y;    
 }
 
-
-let highestY = doodlerY; // Track the highest Y position reached
-
 function updateScore() {
-    if (doodler.y < highestY) { // Player is moving upwards
-        score += Math.floor(highestY - doodler.y); // Increment score based on upward progress
-        highestY = doodler.y; // Update the highest Y position
+    // Increase the score when the player is going upwards
+    if (doodler.y < lastYPosition) {
+        score += 1; // Increment the score as the player goes up
+        maxScore = score > maxScore ? score : maxScore; // Track max score during the game session
     }
 
     // Update high score if current score exceeds it
     if (score > highScore) {
         highScore = score;
     }
+
+    lastYPosition = doodler.y; // Update last Y position for the next frame
 }
-
-
-
 
 function generateStars() {
     for (let i = 0; i < numStars; i++) {
