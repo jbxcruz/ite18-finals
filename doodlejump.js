@@ -102,7 +102,6 @@ function update() {
 
         if (velocityY < 0 && doodler.y < boardHeight * 3 / 4) {
             platform.y -= jumpVelocity;
-            platform.y -= screenScrollSpeed; // Faster upward movement
         }
 
         if (detectCollision(doodler, platform) && velocityY >= 0) {
@@ -126,6 +125,11 @@ function update() {
 
     updateScore();
     displayText();
+
+    if (gameOver) {
+        displayGameOver();
+    }
+}
 
 
     
