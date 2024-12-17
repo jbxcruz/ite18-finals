@@ -1,5 +1,6 @@
 
 
+
 let board;
 let boardWidth = 360;
 let boardHeight = 576;
@@ -45,7 +46,7 @@ let lastYPosition = doodlerY;
 window.onload = function () {
     // Prompt for the player's name and limit to 8 characters
     playerName = prompt("Enter your name (Max 8 characters):");
-    playerName = playerName ? playerName.substring(0, 😎 : "Player"; // Limit to 8 characters
+    playerName = playerName ? playerName.substring(0, 8) : "Player"; // Limit to 8 characters
 
     // Your existing board and game setup code follows
     board = document.getElementById("board");
@@ -278,3 +279,5 @@ function drawStars() {
         context.fill();
     }
 }
+
+
