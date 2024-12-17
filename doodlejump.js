@@ -166,53 +166,41 @@ function moveDoodler(e) {
     }
 }
 
+
 function placePlatforms() {
     platformArray = [];
 
-    // First platform at the bottom
+    // First platform at the bottom (non-breakable)
     let platform = {
         img: platformImg,
-        x: boardWidth / 2 - platformWidth / 2, // Center platform horizontally
-        y: boardHeight - platformHeight - 10,  // Place it just above the bottom edge
+        x: boardWidth / 2 - platformWidth / 2,
+        y: boardHeight - platformHeight - 10,
         width: platformWidth,
         height: platformHeight,
         isBreakable: false
     };
     platformArray.push(platform);
 
-    // Define a minimum vertical distance between platforms
-    const minVerticalDistance = 100;
-    const minHorizontalSpacing = 70; // Minimum horizontal spacing between platforms
-
-    // Generate 6 additional platforms, ensuring even distribution
-    let currentX = platform.x; // Start with the first platform's X position
-    let yOffset = minVerticalDistance; // Initial vertical offset
-
+    // Generate 6 additional platforms
     for (let i = 1; i <= 6; i++) {
-        let randomX = Math.random() * (boardWidth - platformWidth); // Random X position
-        let randomY = boardHeight - (i * minVerticalDistance) - Math.random() * 50; // Random Y position within the bounds
+        let randomX = Math.random() * (boardWidth - platformWidth);
+        let randomY = boardHeight - (i * 100); // Even spacing vertically
 
-        // Ensure platforms are evenly spaced horizontally
-        while (Math.abs(currentX - randomX) < minHorizontalSpacing) {
-            randomX = Math.random() * (boardWidth - platformWidth); // Randomize again if too close
-        }
-
-        // 20% chance for the platform to be breakable
-        let isBreakable = Math.random() < 0.2;
+        let isBreakable = Math.random() < 0.2; // 20% chance for breakable platforms
 
         platform = {
-            img: isBreakable ? breakablePlatformImg : platformImg,  // Use breakable platform image if isBreakable is true
+            img: isBreakable ? breakablePlatformImg : platformImg,
             x: randomX,
             y: randomY,
             width: platformWidth,
             height: platformHeight,
             isBreakable: isBreakable
         };
-
         platformArray.push(platform);
-        currentX = randomX; // Update currentX for next platform
     }
 }
+
+
 
 function newPlatform() {
     let randomX = Math.random() * (boardWidth - platformWidth); // Random X position
