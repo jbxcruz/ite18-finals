@@ -1,5 +1,3 @@
-let maxYPosition = doodlerY; // Track the highest Y position the character has reached
-
 
 let board;
 let boardWidth = 360;
@@ -42,6 +40,8 @@ let gameOver = false;
 let highScore = 0;
 let playerName = '';
 let lastYPosition = doodlerY;
+
+let maxYPosition = doodlerY; // Track the highest Y position the character has reached
 
 
 
