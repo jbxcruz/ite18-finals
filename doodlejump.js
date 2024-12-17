@@ -92,8 +92,16 @@ function update() {
     if (doodler.x > boardWidth) doodler.x = 0;
     if (doodler.x + doodler.width < 0) doodler.x = boardWidth;
 
+    // Update the velocity and position of the doodler
     velocityY += velocityY < 0 ? bounceGravity : fallGravity;
-    doodler.y += velocityY;
+
+    // Prevent the character from going off-screen when jumping upwards
+    if (doodler.y + velocityY < 0) {
+        velocityY = 0; // Stop the upward motion
+        doodler.y = 0; // Set the Y position to 0 (top of the screen)
+    } else {
+        doodler.y += velocityY;
+    }
 
     if (doodler.y > boardHeight) gameOver = true;
 
@@ -133,6 +141,8 @@ function update() {
         displayGameOver();
     }
 }
+
+
 
 function moveDoodler(e) {
     if (e.code === "ArrowRight" || e.code === "KeyD") {
