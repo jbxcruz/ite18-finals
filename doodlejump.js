@@ -143,6 +143,7 @@ function moveDoodler(e) {
     }
 }
 
+
 function placePlatforms() {
     platformArray = [];
     let platform = {
@@ -222,8 +223,8 @@ function displayText() {
 function displayGameOver() {
     context.fillStyle = "red";
     context.font = "20px sans-serif";
-    context.fillText("Game Over: Press 'Space' to Restart", boardWidth / 8, boardHeight * 7 / 8);
-    context.fillText(`Your final score is ${Math.floor(score)}`, boardWidth / 4, boardHeight / 2);
+    context.fillText("Game Over: Press 'Space' to Restart", boardWidth / 2, boardHeight / 2);
+    context.fillText(`Your final score is ${Math.floor(score)}`, boardWidth / 2, boardHeight * 3 / 4);
 }
 
 function resetGame() {
