@@ -193,6 +193,8 @@ function moveDoodler(e) {
     }
 }
 
+
+
 function placePlatforms() {
     platformArray = [];
     let platform = {
@@ -205,19 +207,20 @@ function placePlatforms() {
     };
     platformArray.push(platform);
 
-    const minVerticalDistance = 70; // Reduced spacing for denser platforms
-    const minHorizontalSpacing = 60;
+    const minVerticalDistance = 60; // Reduced spacing for denser platforms
+    const minHorizontalSpacing = 50;
+    const maxVerticalDistance = 100; // Added max spacing to avoid large gaps
     let currentX = platform.x;
 
-    for (let i = 1; i <= 10; i++) { // Increased initial platform count
+    for (let i = 1; i <= 12; i++) { // Increased initial platform count
         let randomX = Math.random() * (boardWidth - platformWidth);
-        let randomY = boardHeight - (i * minVerticalDistance) - Math.random() * 50;
+        let randomY = boardHeight - (i * (Math.random() * (maxVerticalDistance - minVerticalDistance) + minVerticalDistance));
 
         while (Math.abs(currentX - randomX) < minHorizontalSpacing) {
             randomX = Math.random() * (boardWidth - platformWidth);
         }
 
-        let isBreakable = Math.random() < 0.3; // 20% chance for breakable platform
+        let isBreakable = Math.random() < 0.2; // 20% chance for breakable platform
 
         platform = {
             img: isBreakable ? breakablePlatformImg : platformImg,
