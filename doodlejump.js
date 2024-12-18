@@ -198,11 +198,12 @@ function moveDoodler(e) {
 
 
 function getBreakableChance(score) {
-    if (score >= 1500) return 0.8; // 80%
-    if (score >= 1000) return 0.6; // 60%
-    if (score >= 500) return 0.4;  // 40%
-    return 0.2;                    // 20%
+    if (score >= 1500) return 0.7; // 80%
+    if (score >= 1000) return 0.5; // 60%
+    if (score >= 500) return 0.3;  // 40%
+    return 0.1;                    // 20%
 }
+
 
 function placePlatforms() {
     platformArray = [];
@@ -228,8 +229,8 @@ function placePlatforms() {
             randomX = Math.random() * (boardWidth - platformWidth);
         }
 
-        let isBreakableChance = getBreakableChance(score); // Adjust based on score
-        let isBreakable = Math.random() < isBreakableChance;
+        let breakableChance = getBreakableChance(score); // Get breakable platform chance
+        let isBreakable = Math.random() < breakableChance; // Determine if the platform is breakable
 
         platform = {
             img: isBreakable ? breakablePlatformImg : platformImg,
@@ -244,6 +245,8 @@ function placePlatforms() {
         currentX = randomX;
     }
 }
+
+
 
 function newPlatform() {
     const minJumpableDistance = 40;
@@ -270,8 +273,8 @@ function newPlatform() {
         }
     } while (overlapping);
 
-    let isBreakableChance = getBreakableChance(score); // Adjust based on score
-    let isBreakable = Math.random() < isBreakableChance;
+    let breakableChance = getBreakableChance(score); // Get breakable platform chance
+    let isBreakable = Math.random() < breakableChance; // Determine if the platform is breakable
 
     let platform = {
         img: isBreakable ? breakablePlatformImg : platformImg,
@@ -284,6 +287,7 @@ function newPlatform() {
 
     platformArray.push(platform);
 }
+
 
 
 
