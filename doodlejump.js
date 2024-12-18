@@ -82,10 +82,15 @@ window.onload = function () {
         };
     };
 
+    // Key event listeners for desktop controls
     document.addEventListener("keydown", moveDoodler);
     document.addEventListener("keyup", stopDoodler);
+
+    // Touch event listeners for mobile controls
     document.addEventListener("touchstart", handleTouchStart);
     document.addEventListener("touchend", handleTouchEnd);
+
+    // Resize event listener for responsiveness
     window.addEventListener("resize", adjustScreen);
 };
 
@@ -210,6 +215,7 @@ function adjustScreen() {
 }
 
 // Remaining game logic remains unchanged (placePlatforms, newPlatform, detectCollision, updateScore, etc.)
+
 
 
 
