@@ -1,10 +1,8 @@
 
-
 let board;
 let boardWidth = 360;
 let boardHeight = 576;
 let context;
-
 
 /// doodle char
 let doodlerWidth = 46;
@@ -14,8 +12,6 @@ let doodlerY = boardHeight * 7 / 8 - doodlerHeight;
 let doodlerRightImg;
 let doodlerLeftImg;
 
-
-
 let doodler = {
     img: null,
     x: doodlerX,
@@ -24,7 +20,6 @@ let doodler = {
     height: doodlerHeight
 };
 
-
 /// jump gravity
 let velocityX = 0;
 let velocityY = 0;
@@ -32,7 +27,9 @@ let jumpVelocity = -10;
 let bounceGravity = 0.4;
 let fallGravity = 0.4;
 
-
+let moveDirection = 0; // -1 for left, 1 for right, 0 for stationary
+let maxSpeed = 8; // Maximum speed for Doodler
+let acceleration = 0.1; // Acceleration rate
 
 /// platform
 let platformArray = [];
@@ -41,23 +38,178 @@ let platformHeight = 18;
 let platformImg;
 let breakablePlatformImg;
 
-
 /// stars
 let stars = [];
 let numStars = 100;
 
-
-///
+// Game state variables
 let score = 0;
-let maxScore = 0;
-let gameOver = false;
 let highScore = 0;
+let gameOver = false;
 let playerName = '';
 let lastYPosition = doodlerY;
 
+window.onload = function () {
+    playerName = prompt("Enter your name (Max 8 characters):");
+    playerName = playerName ? playerName.substring(0, 8) : "Player";
 
+    board = document.getElementById("board");
+    board.height = boardHeight;
+    board.width = boardWidth;
+    context = board.getContext("2d");
 
+    board.style.margin = "auto";
+    board.style.display = "block";
 
+    doodlerRightImg = new Image();
+    doodlerRightImg.src = "./doodler-right.png";
+    doodlerLeftImg = new Image();
+    doodlerLeftImg.src = "./doodler-left.png";
+    platformImg = new Image();
+    platformImg.src = "./platform.png";
+    breakablePlatformImg = new Image();
+    breakablePlatformImg.src = "./platform-broken.png";
+
+    doodler.img = doodlerRightImg;
+    velocityY = jumpVelocity;
+
+    doodlerRightImg.onload = function () {
+        platformImg.onload = function () {
+            placePlatforms();
+            generateStars();
+            adjustScreen();
+            requestAnimationFrame(update);
+        };
+    };
+
+    document.addEventListener("keydown", moveDoodler);
+    document.addEventListener("keyup", stopDoodler);
+    document.addEventListener("touchstart", handleTouchStart);
+    document.addEventListener("touchend", handleTouchEnd);
+    window.addEventListener("resize", adjustScreen);
+};
+
+function update() {
+    if (gameOver) return;
+
+    requestAnimationFrame(update);
+    context.clearRect(0, 0, board.width, board.height);
+
+    drawStars();
+
+    // Gradual acceleration for movement
+    if (moveDirection !== 0) {
+        velocityX += moveDirection * acceleration; // Accelerate in the direction
+        velocityX = Math.max(-maxSpeed, Math.min(maxSpeed, velocityX)); // Cap velocity
+    } else {
+        velocityX *= 0.9; // Apply friction to slow down when not moving
+    }
+
+    doodler.x += velocityX;
+    if (doodler.x > boardWidth) doodler.x = 0;
+    if (doodler.x + doodler.width < 0) doodler.x = boardWidth;
+
+    if (velocityY < 0) {
+        velocityY += bounceGravity;
+    } else {
+        velocityY += fallGravity;
+    }
+    doodler.y += velocityY;
+
+    const doodlerThreshold = boardHeight / 2;
+    if (doodler.y < doodlerThreshold) {
+        const offset = doodlerThreshold - doodler.y;
+        doodler.y = doodlerThreshold;
+
+        for (let platform of platformArray) {
+            platform.y += offset;
+        }
+
+        for (let star of stars) {
+            star.y = (star.y + offset) % boardHeight;
+        }
+
+        score += offset * 0.1;
+    }
+
+    if (doodler.y > boardHeight) gameOver = true;
+
+    context.drawImage(doodler.img, doodler.x, doodler.y, doodler.width, doodler.height);
+
+    let toRemove = [];
+    for (let i = 0; i < platformArray.length; i++) {
+        let platform = platformArray[i];
+
+        if (detectCollision(doodler, platform) && velocityY >= 0) {
+            if (platform.isBreakable) {
+                toRemove.push(i);
+            }
+            velocityY = jumpVelocity;
+        }
+
+        context.drawImage(platform.img, platform.x, platform.y, platform.width, platform.height);
+    }
+
+    for (let index of toRemove) {
+        platformArray.splice(index, 1);
+    }
+
+    while (platformArray.length > 0 && platformArray[0].y >= boardHeight) {
+        platformArray.shift();
+        newPlatform();
+    }
+
+    updateScore();
+    displayText();
+
+    if (gameOver) {
+        displayGameOver();
+    }
+}
+
+function moveDoodler(e) {
+    if (e.code === "ArrowRight" || e.code === "KeyD") {
+        moveDirection = 1; // Move right
+        doodler.img = doodlerRightImg;
+    } else if (e.code === "ArrowLeft" || e.code === "KeyA") {
+        moveDirection = -1; // Move left
+        doodler.img = doodlerLeftImg;
+    } else if (e.code === "Space" && gameOver) {
+        resetGame();
+        requestAnimationFrame(update);
+    }
+}
+
+function stopDoodler(e) {
+    if (e.code === "ArrowRight" || e.code === "KeyD" || e.code === "ArrowLeft" || e.code === "KeyA") {
+        moveDirection = 0;
+        velocityX = 0;
+    }
+}
+
+function handleTouchStart(e) {
+    const touchX = e.touches[0].clientX;
+    if (touchX > window.innerWidth / 2) {
+        moveDirection = 1; // Move right
+        doodler.img = doodlerRightImg;
+    } else {
+        moveDirection = -1; // Move left
+        doodler.img = doodlerLeftImg;
+    }
+}
+
+function handleTouchEnd() {
+    moveDirection = 0; // Stop movement
+    velocityX = 0;
+}
+
+function adjustScreen() {
+    const scale = Math.min(window.innerWidth / boardWidth, window.innerHeight / boardHeight);
+    board.style.transform = `scale(${scale})`;
+    board.style.transformOrigin = "top left";
+}
+
+// Remaining game logic remains unchanged (placePlatforms, newPlatform, detectCollision, updateScore, etc.)
 
 
 
@@ -111,7 +263,23 @@ function update() {
 
     drawStars();
 
-    doodler.x += velocityX;
+
+if (movingDirection !== 0) {
+    currentSpeed += acceleration;
+    if (currentSpeed > maxSpeed) currentSpeed = maxSpeed;
+
+    velocityX = currentSpeed * movingDirection;
+} else {
+    velocityX = 0;
+    currentSpeed = 0;
+}
+
+doodler.x += velocityX;
+
+if (doodler.x > boardWidth) doodler.x = 0;
+if (doodler.x + doodler.width < 0) doodler.x = boardWidth;
+
+    
     if (doodler.x > boardWidth) doodler.x = 0;
     if (doodler.x + doodler.width < 0) doodler.x = boardWidth;
 
@@ -179,10 +347,10 @@ function update() {
 /// character control function
 function moveDoodler(e) {
     if (e.code === "ArrowRight" || e.code === "KeyD") {
-        velocityX = 4;
+        movingDirection = 1;
         doodler.img = doodlerRightImg;
     } else if (e.code === "ArrowLeft" || e.code === "KeyA") {
-        velocityX = -4;
+        movingDirection = -1;
         doodler.img = doodlerLeftImg;
     } else if (e.code === "Space") {
         if (gameOver) {
@@ -191,6 +359,13 @@ function moveDoodler(e) {
         }
     }
 }
+
+document.addEventListener("keyup", (e) => {
+    if (e.code === "ArrowRight" || e.code === "KeyD" || e.code === "ArrowLeft" || e.code === "KeyA") {
+        movingDirection = 0; // Stop movement
+        currentSpeed = 0; // Reset speed
+    }
+});
 
 
 
