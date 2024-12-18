@@ -223,7 +223,7 @@ function placePlatforms() {
 
     for (let i = 1; i <= 15; i++) {
         let randomX = Math.random() * (boardWidth - platformWidth);
-        let randomY = boardHeight - (i * minVerticalDistance) - Math.random() * 40;
+        let randomY = boardHeight - (i * minVerticalDistance) - Math.random() * 55;
 
         while (Math.abs(currentX - randomX) < minHorizontalSpacing) {
             randomX = Math.random() * (boardWidth - platformWidth);
