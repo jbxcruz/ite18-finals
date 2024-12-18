@@ -207,9 +207,9 @@ function placePlatforms() {
     };
     platformArray.push(platform);
 
-    const minVerticalDistance = 60; // Reduced spacing for denser platforms
+    const minVerticalDistance = 50; // Reduced spacing for denser platforms
     const minHorizontalSpacing = 50;
-    const maxVerticalDistance = 100; // Added max spacing to avoid large gaps
+    const maxVerticalDistance = 70; // Added max spacing to avoid large gaps
     let currentX = platform.x;
 
     for (let i = 1; i <= 12; i++) { // Increased initial platform count
@@ -238,8 +238,8 @@ function placePlatforms() {
 
 
 function newPlatform() {
-    const minVerticalDistance = 60;
-    const maxVerticalDistance = 100;
+    const minVerticalDistance = 50;
+    const maxVerticalDistance = 70;
 
     let randomX = Math.random() * (boardWidth - platformWidth);
     let randomY = platformArray[platformArray.length - 1].y - (Math.random() * (maxVerticalDistance - minVerticalDistance) + minVerticalDistance);
