@@ -195,6 +195,7 @@ function moveDoodler(e) {
 
 
 
+
 function placePlatforms() {
     platformArray = [];
     let platform = {
@@ -207,14 +208,13 @@ function placePlatforms() {
     };
     platformArray.push(platform);
 
-    const minVerticalDistance = 50; // Reduced spacing for denser platforms
-    const minHorizontalSpacing = 50;
-    const maxVerticalDistance = 70; // Added max spacing to avoid large gaps
+    const minVerticalDistance = 80; // Reduced spacing for denser platforms
+    const minHorizontalSpacing = 60;
     let currentX = platform.x;
 
-    for (let i = 1; i <= 12; i++) { // Increased initial platform count
+    for (let i = 1; i <= 10; i++) { // Increased initial platform count
         let randomX = Math.random() * (boardWidth - platformWidth);
-        let randomY = boardHeight - (i * (Math.random() * (maxVerticalDistance - minVerticalDistance) + minVerticalDistance));
+        let randomY = boardHeight - (i * minVerticalDistance) - Math.random() * 50;
 
         while (Math.abs(currentX - randomX) < minHorizontalSpacing) {
             randomX = Math.random() * (boardWidth - platformWidth);
@@ -237,14 +237,39 @@ function placePlatforms() {
 }
 
 
+
+
 function newPlatform() {
-    const minVerticalDistance = 50;
-    const maxVerticalDistance = 70;
+    const minJumpableDistance = 60; // Minimum vertical distance that ensures platforms are jumpable
+    const maxJumpableDistance = 120; // Maximum vertical distance between platforms
 
     let randomX = Math.random() * (boardWidth - platformWidth);
-    let randomY = platformArray[platformArray.length - 1].y - (Math.random() * (maxVerticalDistance - minVerticalDistance) + minVerticalDistance);
+    let randomY = -Math.random() * (maxJumpableDistance - minJumpableDistance) - minJumpableDistance;
 
+    // Ensure no overlap with existing platforms
+    let overlapping;
+    do {
+        overlapping = false;
+        randomX = Math.random() * (boardWidth - platformWidth);
+
+        // Check against all existing platforms for overlap
+        for (let platform of platformArray) {
+            if (
+                randomX < platform.x + platform.width &&
+                randomX + platformWidth > platform.x &&
+                randomY < platform.y + platform.height &&
+                randomY + platformHeight > platform.y
+            ) {
+                overlapping = true;
+                break;
+            }
+        }
+    } while (overlapping);
+
+    // Randomly decide if the platform is breakable
     let isBreakable = Math.random() < 0.2; // 20% chance for breakable platform
+
+    // Create the new platform
     let platform = {
         img: isBreakable ? breakablePlatformImg : platformImg,
         x: randomX,
@@ -253,8 +278,10 @@ function newPlatform() {
         height: platformHeight,
         isBreakable: isBreakable
     };
+
     platformArray.push(platform);
 }
+
 
 
 
