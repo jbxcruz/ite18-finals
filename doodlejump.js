@@ -5,12 +5,16 @@ let boardWidth = 360;
 let boardHeight = 576;
 let context;
 
+
+/// doodle char
 let doodlerWidth = 46;
 let doodlerHeight = 46;
 let doodlerX = boardWidth / 2 - doodlerWidth / 2;
 let doodlerY = boardHeight * 7 / 8 - doodlerHeight;
 let doodlerRightImg;
 let doodlerLeftImg;
+
+
 
 let doodler = {
     img: null,
@@ -20,27 +24,42 @@ let doodler = {
     height: doodlerHeight
 };
 
+
+/// jump gravity
 let velocityX = 0;
 let velocityY = 0;
 let jumpVelocity = -9;
 let bounceGravity = 0.3;
 let fallGravity = 0.8;
 
+
+
+/// platform
 let platformArray = [];
 let platformWidth = 80;
 let platformHeight = 18;
 let platformImg;
 let breakablePlatformImg;
 
+
+/// stars
 let stars = [];
 let numStars = 100;
 
+
+///
 let score = 0;
 let maxScore = 0;
 let gameOver = false;
 let highScore = 0;
 let playerName = '';
 let lastYPosition = doodlerY;
+
+
+
+
+
+
 
 window.onload = function () {
     playerName = prompt("Enter your name (Max 8 characters):");
@@ -76,6 +95,13 @@ window.onload = function () {
 
     document.addEventListener("keydown", moveDoodler);
 };
+
+
+
+
+
+
+
 
 function update() {
     if (gameOver) return;
@@ -147,6 +173,10 @@ function update() {
     }
 }
 
+
+
+
+
 function moveDoodler(e) {
     if (e.code === "ArrowRight" || e.code === "KeyD") {
         velocityX = 4;
@@ -161,6 +191,11 @@ function moveDoodler(e) {
         }
     }
 }
+
+
+
+
+
 
 function placePlatforms() {
     platformArray = [];
@@ -180,7 +215,7 @@ function placePlatforms() {
 
     for (let i = 1; i <= 15; i++) {
         let randomX = Math.random() * (boardWidth - platformWidth);
-        let randomY = boardHeight - (i * minVerticalDistance) - Math.random() * 50;
+        let randomY = boardHeight - (i * minVerticalDistance) - Math.random() * 40;
 
         while (Math.abs(currentX - randomX) < minHorizontalSpacing) {
             randomX = Math.random() * (boardWidth - platformWidth);
@@ -201,6 +236,9 @@ function placePlatforms() {
         currentX = randomX;
     }
 }
+
+
+
 
 function newPlatform() {
     const minJumpableDistance = 30;
@@ -241,12 +279,20 @@ function newPlatform() {
     platformArray.push(platform);
 }
 
+
+
+
+
 function detectCollision(a, b) {
     return a.x < b.x + b.width &&
         a.x + a.width > b.x &&
         a.y < b.y + b.height &&
         a.y + a.height > b.y;
 }
+
+
+
+
 
 function updateScore() {
     let scoreIncrementRate = 0.5;
@@ -257,11 +303,18 @@ function updateScore() {
     if (score > highScore) highScore = score;
 }
 
+
+
+
+
 function displayText() {
     context.fillStyle = "white";
     context.font = "16px 'Gloria Hallelujah', cursive";
     context.fillText(`${playerName} ${Math.floor(score)}`, 5, 20);
 }
+
+
+
 
 function displayGameOver() {
     context.fillStyle = "white";
@@ -271,6 +324,9 @@ function displayGameOver() {
     context.fillText(`Your final score is ${Math.floor(score)}`, boardWidth / 2 - 100, boardHeight * 3 / 4);
     context.fillText(`High Score: ${Math.floor(highScore)}`, boardWidth / 2 - 100, boardHeight * 3 / 4 + 30);
 }
+
+
+
 
 function resetGame() {
     doodler = {
@@ -290,6 +346,12 @@ function resetGame() {
     placePlatforms();
     generateStars();
 }
+
+
+
+
+
+//// functions of stars side
 
 function generateStars() {
     for (let i = 0; i < numStars; i++) {
