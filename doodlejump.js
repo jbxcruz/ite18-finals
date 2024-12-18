@@ -1,8 +1,12 @@
 
+
+
+
 let board;
 let boardWidth = 360;
 let boardHeight = 576;
 let context;
+
 
 /// doodle char
 let doodlerWidth = 46;
@@ -12,6 +16,8 @@ let doodlerY = boardHeight * 7 / 8 - doodlerHeight;
 let doodlerRightImg;
 let doodlerLeftImg;
 
+
+
 let doodler = {
     img: null,
     x: doodlerX,
@@ -20,6 +26,7 @@ let doodler = {
     height: doodlerHeight
 };
 
+
 /// jump gravity
 let velocityX = 0;
 let velocityY = 0;
@@ -27,9 +34,7 @@ let jumpVelocity = -10;
 let bounceGravity = 0.4;
 let fallGravity = 0.4;
 
-let moveDirection = 0; // -1 for left, 1 for right, 0 for stationary
-let maxSpeed = 8; // Maximum speed for Doodler
-let acceleration = 0.1; // Acceleration rate
+
 
 /// platform
 let platformArray = [];
@@ -38,16 +43,25 @@ let platformHeight = 18;
 let platformImg;
 let breakablePlatformImg;
 
+
 /// stars
 let stars = [];
 let numStars = 100;
 
-// Game state variables
+
+///
 let score = 0;
-let highScore = 0;
+let maxScore = 0;
 let gameOver = false;
+let highScore = 0;
 let playerName = '';
 let lastYPosition = doodlerY;
+
+
+
+
+
+
 
 window.onload = function () {
     playerName = prompt("Enter your name (Max 8 characters):");
@@ -77,22 +91,19 @@ window.onload = function () {
         platformImg.onload = function () {
             placePlatforms();
             generateStars();
-            adjustScreen();
             requestAnimationFrame(update);
         };
     };
 
-    // Key event listeners for desktop controls
     document.addEventListener("keydown", moveDoodler);
-    document.addEventListener("keyup", stopDoodler);
-
-    // Touch event listeners for mobile controls
-    document.addEventListener("touchstart", handleTouchStart);
-    document.addEventListener("touchend", handleTouchEnd);
-
-    // Resize event listener for responsiveness
-    window.addEventListener("resize", adjustScreen);
 };
+
+
+
+
+
+
+
 
 function update() {
     if (gameOver) return;
@@ -101,14 +112,6 @@ function update() {
     context.clearRect(0, 0, board.width, board.height);
 
     drawStars();
-
-    // Gradual acceleration for movement
-    if (moveDirection !== 0) {
-        velocityX += moveDirection * acceleration; // Accelerate in the direction
-        velocityX = Math.max(-maxSpeed, Math.min(maxSpeed, velocityX)); // Cap velocity
-    } else {
-        velocityX *= 0.9; // Apply friction to slow down when not moving
-    }
 
     doodler.x += velocityX;
     if (doodler.x > boardWidth) doodler.x = 0;
@@ -172,49 +175,24 @@ function update() {
     }
 }
 
+
+
+
+/// character control function
 function moveDoodler(e) {
     if (e.code === "ArrowRight" || e.code === "KeyD") {
-        moveDirection = 1; // Move right
+        velocityX = 4;
         doodler.img = doodlerRightImg;
     } else if (e.code === "ArrowLeft" || e.code === "KeyA") {
-        moveDirection = -1; // Move left
+        velocityX = -4;
         doodler.img = doodlerLeftImg;
-    } else if (e.code === "Space" && gameOver) {
-        resetGame();
-        requestAnimationFrame(update);
+    } else if (e.code === "Space") {
+        if (gameOver) {
+            resetGame();
+            requestAnimationFrame(update);
+        }
     }
 }
-
-function stopDoodler(e) {
-    if (e.code === "ArrowRight" || e.code === "KeyD" || e.code === "ArrowLeft" || e.code === "KeyA") {
-        moveDirection = 0;
-        velocityX = 0;
-    }
-}
-
-function handleTouchStart(e) {
-    const touchX = e.touches[0].clientX;
-    if (touchX > window.innerWidth / 2) {
-        moveDirection = 1; // Move right
-        doodler.img = doodlerRightImg;
-    } else {
-        moveDirection = -1; // Move left
-        doodler.img = doodlerLeftImg;
-    }
-}
-
-function handleTouchEnd() {
-    moveDirection = 0; // Stop movement
-    velocityX = 0;
-}
-
-function adjustScreen() {
-    const scale = Math.min(window.innerWidth / boardWidth, window.innerHeight / boardHeight);
-    board.style.transform = `scale(${scale})`;
-    board.style.transformOrigin = "top left";
-}
-
-// Remaining game logic remains unchanged (placePlatforms, newPlatform, detectCollision, updateScore, etc.)
 
 
 
@@ -407,3 +385,5 @@ function drawStars() {
         context.fill();
     }
 }
+
+
