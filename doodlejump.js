@@ -318,7 +318,7 @@ function displayText() {
 
 function displayGameOver() {
     context.fillStyle = "white";
-    context.font = "'15 px Gloria Hallelujah', cursive";
+    context.font = "15px 'Gloria Hallelujah', cursive";
     context.fillText(`High Score: ${Math.floor(highScore)}`, boardWidth / 2 - 100, 30);
     context.fillText("Game Over: Press 'Space' to Restart", boardWidth / 2 - 150, boardHeight / 2);
     context.fillText(`Your final score is ${Math.floor(score)}`, boardWidth / 2 - 100, boardHeight * 3 / 4);
