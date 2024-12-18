@@ -29,7 +29,7 @@ let bounceGravity = 0.3;
 let fallGravity = 0.8;
 
 let platformArray = [];
-let platformWidth = 100;
+let platformWidth = 80;
 let platformHeight = 18;
 let platformImg;
 let breakablePlatformImg;
@@ -208,7 +208,7 @@ function placePlatforms() {
     };
     platformArray.push(platform);
 
-    const minVerticalDistance = 70; // Reduced spacing for denser platforms
+    const minVerticalDistance = 50; // Reduced spacing for denser platforms
     const minHorizontalSpacing = 50;
     let currentX = platform.x;
 
@@ -240,8 +240,8 @@ function placePlatforms() {
 
 
 function newPlatform() {
-    const minJumpableDistance = 50; // Minimum vertical distance that ensures platforms are jumpable
-    const maxJumpableDistance = 80; // Maximum vertical distance between platforms
+    const minJumpableDistance = 30; // Minimum vertical distance that ensures platforms are jumpable
+    const maxJumpableDistance = 55; // Maximum vertical distance between platforms
 
     let randomX = Math.random() * (boardWidth - platformWidth);
     let randomY = -Math.random() * (maxJumpableDistance - minJumpableDistance) - minJumpableDistance;
