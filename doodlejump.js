@@ -1,36 +1,28 @@
 
 
-let board;
-let boardWidth = 360;
-let boardHeight = 576;
-let context;
 
-let doodlerWidth = 46;
-let doodlerHeight = 46;
-let doodlerX = boardWidth / 2 - doodlerWidth / 2;
-let doodlerY = boardHeight * 7 / 8 - doodlerHeight;
+let board, context;
+let boardWidth = 360, boardHeight = 576;
 
-let doodlerRightImg, doodlerLeftImg, platformImg, breakablePlatformImg;
-let doodler = { img: null, x: doodlerX, y: doodlerY, width: doodlerWidth, height: doodlerHeight };
+let doodlerWidth = 46, doodlerHeight = 46;
+let doodler = { x: boardWidth / 2 - doodlerWidth / 2, y: boardHeight * 7 / 8 - doodlerHeight, width: doodlerWidth, height: doodlerHeight, img: null };
 
-let velocityX = 0;
-let velocityY = 0;
-let jumpVelocity = -9;
-let bounceGravity = 0.3;
-let fallGravity = 0.8;
+let velocityX = 0, velocityY = -9;
+const jumpVelocity = -9, bounceGravity = 0.3, fallGravity = 0.8;
 
+const platformWidth = 80, platformHeight = 18;
 let platformArray = [];
-let platformWidth = 80;
-let platformHeight = 18;
+const stars = [];
+const numStars = 30; // Reduce stars for better performance
 
-let stars = [];
-let numStars = 50; // Reduced to optimize rendering
+let score = 0, highScore = 0, gameOver = false, playerName = "Player";
+const platformImg = new Image(), breakablePlatformImg = new Image(), doodlerRightImg = new Image(), doodlerLeftImg = new Image();
 
-let score = 0;
-let highScore = 0;
-let gameOver = false;
-let playerName = "Player";
-let lastYPosition = doodlerY;
+// Preload images
+platformImg.src = "./platform.png";
+breakablePlatformImg.src = "./platform-broken.png";
+doodlerRightImg.src = "./doodler-right.png";
+doodlerLeftImg.src = "./doodler-left.png";
 
 window.onload = function () {
     playerName = prompt("Enter your name (Max 8 characters):") || "Player";
@@ -41,54 +33,49 @@ window.onload = function () {
     board.width = boardWidth;
     context = board.getContext("2d");
 
-    doodlerRightImg = loadImage("./doodler-right.png");
-    doodlerLeftImg = loadImage("./doodler-left.png");
-    platformImg = loadImage("./platform.png");
-    breakablePlatformImg = loadImage("./platform-broken.png");
-
     doodler.img = doodlerRightImg;
-    velocityY = jumpVelocity;
 
-    Promise.all([doodlerRightImg, platformImg]).then(() => {
+    doodlerRightImg.onload = () => {
         placePlatforms();
         generateStars();
+        velocityY = jumpVelocity;
         requestAnimationFrame(update);
-    });
+    };
 
     document.addEventListener("keydown", moveDoodler);
 };
 
-// Utility to load images
-function loadImage(src) {
-    return new Promise((resolve) => {
-        const img = new Image();
-        img.src = src;
-        img.onload = () => resolve(img);
-    });
-}
-
 function update() {
     if (gameOver) return;
 
-    context.clearRect(0, 0, board.width, board.height);
+    context.clearRect(0, 0, boardWidth, boardHeight);
 
+    // Render stars (skip stars not visible on the canvas)
     drawStars();
+
+    // Handle Doodler logic
     moveDoodlerHorizontally();
     applyGravity();
     adjustCamera();
 
-    if (doodler.y > boardHeight) gameOver = true;
+    // End game if Doodler falls off
+    if (doodler.y > boardHeight) {
+        gameOver = true;
+        displayGameOver();
+        return;
+    }
 
     context.drawImage(doodler.img, doodler.x, doodler.y, doodler.width, doodler.height);
 
+    // Handle platforms
     updatePlatforms();
-    removeOffScreenPlatforms();
-    generateNewPlatforms();
+
+    // Score display
     updateScore();
     displayText();
 
-    if (gameOver) displayGameOver();
-    else requestAnimationFrame(update);
+    // Request next animation frame
+    requestAnimationFrame(update);
 }
 
 function moveDoodler(e) {
@@ -116,127 +103,97 @@ function applyGravity() {
 }
 
 function adjustCamera() {
-    const threshold = boardHeight / 2;
-    if (doodler.y < threshold) {
-        const offset = threshold - doodler.y;
-        doodler.y = threshold;
+    const cameraThreshold = boardHeight / 2;
+    if (doodler.y < cameraThreshold) {
+        const offset = cameraThreshold - doodler.y;
+        doodler.y = cameraThreshold;
 
         platformArray.forEach((platform) => (platform.y += offset));
-        stars.forEach((star) => (star.y = (star.y + offset) % boardHeight));
+        stars.forEach((star) => (star.y += offset));
 
         score += offset * 0.1;
     }
 }
 
 function updatePlatforms() {
+    platformArray = platformArray.filter((platform) => platform.y < boardHeight); // Remove off-screen platforms
+
     for (let platform of platformArray) {
         if (detectCollision(doodler, platform) && velocityY >= 0) {
             velocityY = jumpVelocity;
             if (platform.isBreakable) platformArray.splice(platformArray.indexOf(platform), 1);
         }
-        if (platform.y >= 0) {
-            context.drawImage(platform.img, platform.x, platform.y, platform.width, platform.height);
-        }
+        context.drawImage(platform.img, platform.x, platform.y, platform.width, platform.height);
     }
-}
 
-function removeOffScreenPlatforms() {
-    platformArray = platformArray.filter((platform) => platform.y < boardHeight);
-}
-
-function generateNewPlatforms() {
-    while (platformArray.length > 0 && platformArray[0].y >= boardHeight) {
-        platformArray.shift();
-        newPlatform();
+    while (platformArray.length < 10) {
+        addNewPlatform();
     }
 }
 
 function placePlatforms() {
-    platformArray = [];
     for (let i = 0; i < 10; i++) {
         const x = Math.random() * (boardWidth - platformWidth);
         const y = boardHeight - (i + 1) * 60;
-        platformArray.push({
-            img: Math.random() < 0.2 ? breakablePlatformImg : platformImg,
-            x,
-            y,
-            width: platformWidth,
-            height: platformHeight,
-            isBreakable: Math.random() < 0.2,
-        });
+        platformArray.push({ x, y, width: platformWidth, height: platformHeight, img: platformImg, isBreakable: false });
     }
 }
 
-function newPlatform() {
+function addNewPlatform() {
     const x = Math.random() * (boardWidth - platformWidth);
-    const y = -platformHeight - Math.random() * 50;
+    const y = -platformHeight - Math.random() * 100;
     const isBreakable = Math.random() < 0.2;
-    platformArray.push({
-        img: isBreakable ? breakablePlatformImg : platformImg,
-        x,
-        y,
-        width: platformWidth,
-        height: platformHeight,
-        isBreakable,
-    });
+    platformArray.push({ x, y, width: platformWidth, height: platformHeight, img: isBreakable ? breakablePlatformImg : platformImg, isBreakable });
 }
 
 function detectCollision(a, b) {
-    return (
-        a.x < b.x + b.width &&
-        a.x + a.width > b.x &&
-        a.y < b.y + b.height &&
-        a.y + a.height > b.y
-    );
+    return a.x < b.x + b.width && a.x + a.width > b.x && a.y < b.y + b.height && a.y + a.height > b.y;
 }
 
 function generateStars() {
-    stars = Array.from({ length: numStars }, () => ({
-        x: Math.random() * boardWidth,
-        y: Math.random() * boardHeight,
-    }));
+    for (let i = 0; i < numStars; i++) {
+        stars.push({ x: Math.random() * boardWidth, y: Math.random() * boardHeight });
+    }
 }
 
 function drawStars() {
-    stars.forEach((star) => {
-        context.fillStyle = "white";
-        context.beginPath();
-        context.arc(star.x, star.y, 1.5, 0, Math.PI * 2);
-        context.fill();
-    });
+    for (let star of stars) {
+        if (star.y >= 0 && star.y <= boardHeight) { // Only draw stars in view
+            context.fillStyle = "white";
+            context.beginPath();
+            context.arc(star.x, star.y, 1.5, 0, Math.PI * 2);
+            context.fill();
+        }
+    }
 }
 
 function updateScore() {
-    if (doodler.y < lastYPosition) {
-        score += 0.5;
-        lastYPosition = doodler.y;
-    }
     highScore = Math.max(highScore, score);
 }
 
 function displayText() {
     context.fillStyle = "white";
-    context.font = "16px 'Gloria Hallelujah', cursive";
-    context.fillText(`${playerName} ${Math.floor(score)}`, 5, 20);
+    context.font = "16px Arial";
+    context.fillText(`${playerName}: ${Math.floor(score)}`, 5, 20);
 }
 
 function displayGameOver() {
     context.fillStyle = "white";
-    context.font = "20px 'Gloria Hallelujah', cursive";
-    context.fillText(`Game Over! Press Space to Restart`, boardWidth / 2 - 100, boardHeight / 2);
-    context.fillText(`Final Score: ${Math.floor(score)}`, boardWidth / 2 - 70, boardHeight / 2 + 30);
-    context.fillText(`High Score: ${Math.floor(highScore)}`, boardWidth / 2 - 70, boardHeight / 2 + 60);
+    context.font = "20px Arial";
+    context.fillText("Game Over! Press Space to Restart", 50, boardHeight / 2);
+    context.fillText(`Score: ${Math.floor(score)}`, 50, boardHeight / 2 + 30);
+    context.fillText(`High Score: ${Math.floor(highScore)}`, 50, boardHeight / 2 + 60);
 }
 
 function resetGame() {
-    doodler = { img: doodlerRightImg, x: doodlerX, y: doodlerY, width: doodlerWidth, height: doodlerHeight };
+    doodler.x = boardWidth / 2 - doodlerWidth / 2;
+    doodler.y = boardHeight * 7 / 8 - doodlerHeight;
     velocityX = 0;
     velocityY = jumpVelocity;
+    platformArray = [];
+    stars.length = 0;
     score = 0;
     gameOver = false;
-    lastYPosition = doodlerY;
-    platformArray = [];
-    stars = [];
     placePlatforms();
     generateStars();
 }
