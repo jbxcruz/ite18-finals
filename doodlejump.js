@@ -89,62 +89,70 @@ function update() {
     requestAnimationFrame(update);
     context.clearRect(0, 0, board.width, board.height);
 
+    // Draw background stars
     drawStars();
 
-    // Apply movement to the Doodler
+    // Apply Doodler movement
     doodler.x += velocityX;
     if (doodler.x > boardWidth) doodler.x = 0;
     if (doodler.x + doodler.width < 0) doodler.x = boardWidth;
 
-    // Apply gravity
+    // Apply gravity to the Doodler
     if (velocityY < 0) {
-        velocityY += bounceGravity; // Bounce effect
+        velocityY += bounceGravity;
     } else {
-        velocityY += fallGravity; // Falling gravity
+        velocityY += fallGravity;
     }
-
     doodler.y += velocityY;
 
-    // Center the screen on the Doodler when it reaches the top half
+    // Camera adjustment when the Doodler crosses the threshold
     const doodlerThreshold = boardHeight / 2;
     if (doodler.y < doodlerThreshold) {
         const offset = doodlerThreshold - doodler.y;
         doodler.y = doodlerThreshold;
 
-        // Move platforms and stars downward relative to the offset
+        // Move platforms down without affecting stars
         for (let platform of platformArray) {
             platform.y += offset;
         }
+
+        // Adjust stars' positions only visually (relative to the offset)
         for (let star of stars) {
-            star.y += offset;
+            star.y = (star.y + offset) % boardHeight; // Wrap stars to prevent visual shifting
         }
-        score += offset * 0.05; // Increment score based on upward movement
+
+        score += offset * 0.05; // Increment score for upward movement
     }
 
-    // Prevent character from falling off the screen
+    // Prevent the Doodler from falling off the screen
     if (doodler.y > boardHeight) gameOver = true;
 
+    // Draw the Doodler
     context.drawImage(doodler.img, doodler.x, doodler.y, doodler.width, doodler.height);
 
-    // Handle platform collision and update platform positions
+    // Handle platform collisions and update positions
     let toRemove = [];
     for (let i = 0; i < platformArray.length; i++) {
         let platform = platformArray[i];
 
+        // Detect collision
         if (detectCollision(doodler, platform) && velocityY >= 0) {
             if (platform.isBreakable) {
                 toRemove.push(i);
             }
-            velocityY = jumpVelocity; // Jump when hitting a platform
+            velocityY = jumpVelocity; // Reset jump velocity on platform collision
         }
 
+        // Draw platform
         context.drawImage(platform.img, platform.x, platform.y, platform.width, platform.height);
     }
 
+    // Remove platforms marked for removal
     for (let index of toRemove) {
         platformArray.splice(index, 1);
     }
 
+    // Remove off-screen platforms and generate new ones
     while (platformArray.length > 0 && platformArray[0].y >= boardHeight) {
         platformArray.shift();
         newPlatform();
@@ -153,10 +161,12 @@ function update() {
     updateScore();
     displayText();
 
+    // Display game-over screen if applicable
     if (gameOver) {
         displayGameOver();
     }
 }
+
 
 
 function moveDoodler(e) {
