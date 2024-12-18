@@ -205,7 +205,7 @@ function placePlatforms() {
     };
     platformArray.push(platform);
 
-    const minVerticalDistance = 80; // Reduced spacing for denser platforms
+    const minVerticalDistance = 70; // Reduced spacing for denser platforms
     const minHorizontalSpacing = 60;
     let currentX = platform.x;
 
@@ -217,7 +217,7 @@ function placePlatforms() {
             randomX = Math.random() * (boardWidth - platformWidth);
         }
 
-        let isBreakable = Math.random() < 0.2; // 20% chance for breakable platform
+        let isBreakable = Math.random() < 0.3; // 20% chance for breakable platform
 
         platform = {
             img: isBreakable ? breakablePlatformImg : platformImg,
@@ -236,8 +236,8 @@ function placePlatforms() {
 
 
 function newPlatform() {
-    const minJumpableDistance = 60; // Minimum vertical distance that ensures platforms are jumpable
-    const maxJumpableDistance = 120; // Maximum vertical distance between platforms
+    const minJumpableDistance = 50; // Minimum vertical distance that ensures platforms are jumpable
+    const maxJumpableDistance = 100; // Maximum vertical distance between platforms
 
     let randomX = Math.random() * (boardWidth - platformWidth);
     let randomY = -Math.random() * (maxJumpableDistance - minJumpableDistance) - minJumpableDistance;
@@ -263,7 +263,7 @@ function newPlatform() {
     } while (overlapping);
 
     // Randomly decide if the platform is breakable
-    let isBreakable = Math.random() < 0.2; // 20% chance for breakable platform
+    let isBreakable = Math.random() < 0.3; // 20% chance for breakable platform
 
     // Create the new platform
     let platform = {
