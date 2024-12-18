@@ -1,10 +1,9 @@
 
-
-
 let board;
 let boardWidth = 360;
 let boardHeight = 576;
 let context;
+
 
 let doodlerWidth = 46;
 let doodlerHeight = 46;
@@ -12,6 +11,7 @@ let doodlerX = boardWidth / 2 - doodlerWidth / 2;
 let doodlerY = boardHeight * 7 / 8 - doodlerHeight;
 let doodlerRightImg;
 let doodlerLeftImg;
+
 
 let doodler = {
     img: null,
@@ -21,11 +21,12 @@ let doodler = {
     height: doodlerHeight
 };
 
+
 let velocityX = 0;
 let velocityY = 0;
-let jumpVelocity = -6;
-let bounceGravity = 0.2;
-let fallGravity = 0.6;
+let jumpVelocity = -8;
+let bounceGravity = 0.3;
+let fallGravity = 0.8;
 
 let platformArray = [];
 let platformWidth = 80;
@@ -42,6 +43,8 @@ let gameOver = false;
 let highScore = 0;
 let playerName = '';
 let lastYPosition = doodlerY;
+
+
 
 window.onload = function () {
     // Prompt for the player's name and limit to 8 characters
@@ -83,6 +86,8 @@ window.onload = function () {
 
 
 
+
+
 function update() {
     if (gameOver) return;
 
@@ -106,23 +111,25 @@ function update() {
     doodler.y += velocityY;
 
     // Camera adjustment when the Doodler crosses the threshold
-    const doodlerThreshold = boardHeight / 2;
-    if (doodler.y < doodlerThreshold) {
-        const offset = doodlerThreshold - doodler.y;
-        doodler.y = doodlerThreshold;
+const doodlerThreshold = boardHeight / 2; // Doodler threshold stays in the middle of the screen
+if (doodler.y < doodlerThreshold) {
+    const offset = doodlerThreshold - doodler.y;
+    doodler.y = doodlerThreshold;
 
-        // Move platforms down without affecting stars
-        for (let platform of platformArray) {
-            platform.y += offset;
-        }
-
-        // Adjust stars' positions only visually (relative to the offset)
-        for (let star of stars) {
-            star.y = (star.y + offset) % boardHeight; // Wrap stars to prevent visual shifting
-        }
-
-        score += offset * 0.05; // Increment score for upward movement
+    // Move platforms down by the same offset
+    for (let platform of platformArray) {
+        platform.y += offset;
     }
+
+    // Adjust stars' positions visually without changing their background role
+    for (let star of stars) {
+        star.y = (star.y + offset) % boardHeight;
+    }
+
+    // Increment score based on upward movement
+    score += offset * 0.1; // Adjust this multiplier for balanced scoring
+}
+
 
     // Prevent the Doodler from falling off the screen
     if (doodler.y > boardHeight) gameOver = true;
@@ -166,6 +173,8 @@ function update() {
         displayGameOver();
     }
 }
+
+
 
 
 
