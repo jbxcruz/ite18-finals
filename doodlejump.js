@@ -251,7 +251,7 @@ function placePlatforms() {
 
 function newPlatform() {
     const minJumpableDistance = 30;
-    const maxJumpableDistance = 50;
+    const maxJumpableDistance = 40;
 
     let randomX = Math.random() * (boardWidth - platformWidth);
     let randomY = -Math.random() * (maxJumpableDistance - minJumpableDistance) - minJumpableDistance;
