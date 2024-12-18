@@ -199,19 +199,52 @@ function placePlatforms() {
     }
 }
 
+
+
 function newPlatform() {
+    const minJumpableDistance = 60; // Minimum vertical distance that ensures platforms are jumpable
+    const maxJumpableDistance = 120; // Maximum vertical distance between platforms
+
     let randomX = Math.random() * (boardWidth - platformWidth);
+    let randomY = -Math.random() * (maxJumpableDistance - minJumpableDistance) - minJumpableDistance;
+
+    // Ensure no overlap with existing platforms
+    let overlapping;
+    do {
+        overlapping = false;
+        randomX = Math.random() * (boardWidth - platformWidth);
+
+        // Check against all existing platforms for overlap
+        for (let platform of platformArray) {
+            if (
+                randomX < platform.x + platform.width &&
+                randomX + platformWidth > platform.x &&
+                randomY < platform.y + platform.height &&
+                randomY + platformHeight > platform.y
+            ) {
+                overlapping = true;
+                break;
+            }
+        }
+    } while (overlapping);
+
+    // Randomly decide if the platform is breakable
     let isBreakable = Math.random() < 0.2; // 20% chance for breakable platform
+
+    // Create the new platform
     let platform = {
         img: isBreakable ? breakablePlatformImg : platformImg,
         x: randomX,
-        y: -platformHeight / 2,
+        y: randomY,
         width: platformWidth,
         height: platformHeight,
         isBreakable: isBreakable
     };
+
     platformArray.push(platform);
 }
+
+
 
 function detectCollision(a, b) {
     return a.x < b.x + b.width &&
