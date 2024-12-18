@@ -24,7 +24,7 @@ let doodler = {
 
 let velocityX = 0;
 let velocityY = 0;
-let jumpVelocity = -8;
+let jumpVelocity = -9;
 let bounceGravity = 0.3;
 let fallGravity = 0.8;
 
@@ -212,7 +212,7 @@ function placePlatforms() {
     const minHorizontalSpacing = 50;
     let currentX = platform.x;
 
-    for (let i = 1; i <= 10; i++) { // Increased initial platform count
+    for (let i = 1; i <= 20; i++) { // Increased initial platform count
         let randomX = Math.random() * (boardWidth - platformWidth);
         let randomY = boardHeight - (i * minVerticalDistance) - Math.random() * 50;
 
