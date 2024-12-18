@@ -217,7 +217,8 @@ function placePlatforms() {
     };
     platformArray.push(platform);
 
-    const minVerticalDistance = 40;
+    
+    const minVerticalDistance = 30;
     const minHorizontalSpacing = 50;
     let currentX = platform.x;
 
@@ -249,7 +250,7 @@ function placePlatforms() {
 
 
 function newPlatform() {
-    const minJumpableDistance = 40;
+    const minJumpableDistance = 30;
     const maxJumpableDistance = 50;
 
     let randomX = Math.random() * (boardWidth - platformWidth);
