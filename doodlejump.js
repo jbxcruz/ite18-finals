@@ -46,11 +46,12 @@ let lastYPosition = doodlerY;
 
 
 
-
 window.onload = function () {
+    // Prompt for the player's name and limit to 8 characters
     playerName = prompt("Enter your name (Max 8 characters):");
-    playerName = playerName ? playerName.substring(0, 8) : "Player";
+    playerName = playerName ? playerName.substring(0, 8) : "Player"; // Limit to 8 characters
 
+    // Your existing board and game setup code follows
     board = document.getElementById("board");
     board.height = boardHeight;
     board.width = boardWidth;
@@ -58,7 +59,6 @@ window.onload = function () {
 
     board.style.margin = "auto";
     board.style.display = "block";
-    board.style.touchAction = "none"; // Disable default touch behavior
 
     doodlerRightImg = new Image();
     doodlerRightImg.src = "./doodler-right.png";
@@ -81,74 +81,8 @@ window.onload = function () {
         };
     };
 
-    // Add event listeners for desktop and mobile controls
     document.addEventListener("keydown", moveDoodler);
-    board.addEventListener("touchstart", handleTouchStart);
-    board.addEventListener("touchmove", handleTouchMove);
-    board.addEventListener("touchend", handleTouchEnd);
 };
-
-// Variables for touch controls
-let touchStartX = null;
-let touchThreshold = 30; // Minimum movement for a swipe
-
-// Handle touch start
-function handleTouchStart(e) {
-    const touch = e.touches[0];
-    touchStartX = touch.clientX;
-}
-
-// Handle touch move
-function handleTouchMove(e) {
-    if (!touchStartX) return;
-
-    const touch = e.touches[0];
-    const touchX = touch.clientX;
-
-    // Detect horizontal swipe
-    const deltaX = touchX - touchStartX;
-    if (deltaX > touchThreshold) {
-        // Swipe right
-        velocityX = 4;
-        doodler.img = doodlerRightImg;
-    } else if (deltaX < -touchThreshold) {
-        // Swipe left
-        velocityX = -4;
-        doodler.img = doodlerLeftImg;
-    }
-}
-
-// Handle touch end
-function handleTouchEnd(e) {
-    touchStartX = null;
-    velocityX = 0; // Stop movement when touch ends
-}
-
-// Adjust doodler position for desktop
-function moveDoodler(e) {
-    if (e.code === "ArrowRight" || e.code === "KeyD") {
-        velocityX = 4;
-        doodler.img = doodlerRightImg;
-    } else if (e.code === "ArrowLeft" || e.code === "KeyA") {
-        velocityX = -4;
-        doodler.img = doodlerLeftImg;
-    } else if (e.code === "Space") {
-        if (gameOver) {
-            resetGame();
-            requestAnimationFrame(update);
-        }
-    }
-}
-
-// Ensure the canvas is responsive
-function resizeCanvas() {
-    const scale = Math.min(window.innerWidth / boardWidth, window.innerHeight / boardHeight);
-    board.style.transform = `scale(${scale})`;
-    board.style.transformOrigin = "top left";
-}
-window.addEventListener("resize", resizeCanvas);
-resizeCanvas();
-
 
 
 
