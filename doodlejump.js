@@ -30,7 +30,7 @@ let velocityX = 0;
 let velocityY = 0;
 let jumpVelocity = -9;
 let bounceGravity = 0.3;
-let fallGravity = 0.8;
+let fallGravity = 0.4;
 
 
 
