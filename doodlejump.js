@@ -241,7 +241,7 @@ function placePlatforms() {
 
 function newPlatform() {
     const minJumpableDistance = 30; // Minimum vertical distance that ensures platforms are jumpable
-    const maxJumpableDistance = 55; // Maximum vertical distance between platforms
+    const maxJumpableDistance = 60; // Maximum vertical distance between platforms
 
     let randomX = Math.random() * (boardWidth - platformWidth);
     let randomY = -Math.random() * (maxJumpableDistance - minJumpableDistance) - minJumpableDistance;
