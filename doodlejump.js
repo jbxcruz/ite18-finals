@@ -309,7 +309,7 @@ function updateScore() {
 
 function displayText() {
     context.fillStyle = "white";
-    context.font = "16px 'Gloria Hallelujah', cursive";
+    context.font = "25px 'Gloria Hallelujah', cursive";
     context.fillText(`${playerName} ${Math.floor(score)}`, 5, 20);
 }
 
@@ -322,7 +322,6 @@ function displayGameOver() {
     context.fillText(`High Score: ${Math.floor(highScore)}`, boardWidth / 2 - 100, 30);
     context.fillText("Game Over: Press 'Space' to Restart", boardWidth / 2 - 150, boardHeight / 2);
     context.fillText(`Your final score is ${Math.floor(score)}`, boardWidth / 2 - 100, boardHeight * 3 / 4);
-    context.fillText(`High Score: ${Math.floor(highScore)}`, boardWidth / 2 - 100, boardHeight * 3 / 4 + 30);
 }
 
 
