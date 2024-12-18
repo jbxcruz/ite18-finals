@@ -81,6 +81,8 @@ window.onload = function () {
     document.addEventListener("keydown", moveDoodler);
 };
 
+
+
 function update() {
     if (gameOver) return;
 
@@ -89,19 +91,35 @@ function update() {
 
     drawStars();
 
-    // Move the doodler
+    // Apply movement to the Doodler
     doodler.x += velocityX;
     if (doodler.x > boardWidth) doodler.x = 0;
     if (doodler.x + doodler.width < 0) doodler.x = boardWidth;
 
-    // Apply gravity when falling
+    // Apply gravity
     if (velocityY < 0) {
-        velocityY += bounceGravity; // Slight bounce effect when moving upwards
+        velocityY += bounceGravity; // Bounce effect
     } else {
-        velocityY += fallGravity; // Gravity when falling down
+        velocityY += fallGravity; // Falling gravity
     }
 
     doodler.y += velocityY;
+
+    // Center the screen on the Doodler when it reaches the top half
+    const doodlerThreshold = boardHeight / 2;
+    if (doodler.y < doodlerThreshold) {
+        const offset = doodlerThreshold - doodler.y;
+        doodler.y = doodlerThreshold;
+
+        // Move platforms and stars downward relative to the offset
+        for (let platform of platformArray) {
+            platform.y += offset;
+        }
+        for (let star of stars) {
+            star.y += offset;
+        }
+        score += offset * 0.05; // Increment score based on upward movement
+    }
 
     // Prevent character from falling off the screen
     if (doodler.y > boardHeight) gameOver = true;
@@ -113,15 +131,11 @@ function update() {
     for (let i = 0; i < platformArray.length; i++) {
         let platform = platformArray[i];
 
-        if (velocityY < -1 && doodler.y < boardHeight * 4 / 4) {
-            platform.y -= jumpVelocity;
-        }
-
         if (detectCollision(doodler, platform) && velocityY >= 0) {
             if (platform.isBreakable) {
                 toRemove.push(i);
             }
-            velocityY = jumpVelocity; // Reset velocity to simulate a jump when hitting a platform
+            velocityY = jumpVelocity; // Jump when hitting a platform
         }
 
         context.drawImage(platform.img, platform.x, platform.y, platform.width, platform.height);
@@ -143,6 +157,7 @@ function update() {
         displayGameOver();
     }
 }
+
 
 function moveDoodler(e) {
     if (e.code === "ArrowRight" || e.code === "KeyD") {
