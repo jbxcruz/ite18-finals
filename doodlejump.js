@@ -179,10 +179,10 @@ function update() {
 
 function moveDoodler(e) {
     if (e.code === "ArrowRight" || e.code === "KeyD") {
-        velocityX = 2;
+        velocityX = 3;
         doodler.img = doodlerRightImg;
     } else if (e.code === "ArrowLeft" || e.code === "KeyA") {
-        velocityX = -2;
+        velocityX = -3;
         doodler.img = doodlerLeftImg;
     } else if (e.code === "Space") {
         if (gameOver) {
