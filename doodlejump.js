@@ -28,8 +28,8 @@ let doodler = {
 /// jump gravity
 let velocityX = 0;
 let velocityY = 0;
-let jumpVelocity = -9;
-let bounceGravity = 0.3;
+let jumpVelocity = -10;
+let bounceGravity = 0.4;
 let fallGravity = 0.4;
 
 
@@ -179,10 +179,10 @@ function update() {
 
 function moveDoodler(e) {
     if (e.code === "ArrowRight" || e.code === "KeyD") {
-        velocityX = 3;
+        velocityX = 4;
         doodler.img = doodlerRightImg;
     } else if (e.code === "ArrowLeft" || e.code === "KeyA") {
-        velocityX = -3;
+        velocityX = -4;
         doodler.img = doodlerLeftImg;
     } else if (e.code === "Space") {
         if (gameOver) {
@@ -209,7 +209,7 @@ function placePlatforms() {
     };
     platformArray.push(platform);
 
-    const minVerticalDistance = 50;
+    const minVerticalDistance = 40;
     const minHorizontalSpacing = 50;
     let currentX = platform.x;
 
@@ -241,8 +241,8 @@ function placePlatforms() {
 
 
 function newPlatform() {
-    const minJumpableDistance = 30;
-    const maxJumpableDistance = 60;
+    const minJumpableDistance = 40;
+    const maxJumpableDistance = 50;
 
     let randomX = Math.random() * (boardWidth - platformWidth);
     let randomY = -Math.random() * (maxJumpableDistance - minJumpableDistance) - minJumpableDistance;
