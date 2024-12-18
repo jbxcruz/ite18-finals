@@ -176,7 +176,7 @@ function update() {
 
 
 
-
+/// character control function
 function moveDoodler(e) {
     if (e.code === "ArrowRight" || e.code === "KeyD") {
         velocityX = 4;
@@ -196,7 +196,7 @@ function moveDoodler(e) {
 
 
 
-
+/// increases Breakable_platform spawn generator by score
 function getBreakableChance(score) {
     if (score >= 1500) return 0.7; // 80%
     if (score >= 1000) return 0.5; // 60%
@@ -205,6 +205,8 @@ function getBreakableChance(score) {
 }
 
 
+
+/// function platforms (Initializes and sets up the initial array of platforms at the start of the game.)
 function placePlatforms() {
     platformArray = [];
     let platform = {
@@ -249,6 +251,7 @@ function placePlatforms() {
 
 
 
+/// function newPlatform (Adds a new platform dynamically during the game as old platforms move off-screen.)
 function newPlatform() {
     const minJumpableDistance = 30;
     const maxJumpableDistance = 60;
@@ -293,7 +296,7 @@ function newPlatform() {
 
 
 
-
+/// function Collision
 function detectCollision(a, b) {
     return a.x < b.x + b.width &&
         a.x + a.width > b.x &&
@@ -304,7 +307,7 @@ function detectCollision(a, b) {
 
 
 
-
+/// function Score update mechanism
 function updateScore() {
     let scoreIncrementRate = 0.5;
     if (doodler.y < lastYPosition) {
@@ -317,7 +320,7 @@ function updateScore() {
 
 
 
-
+/// function display text (for scoring)
 function displayText() {
     context.fillStyle = "white";
     context.font = "25px 'Gloria Hallelujah', cursive";
@@ -326,7 +329,7 @@ function displayText() {
 
 
 
-
+/// function display Game Over to the screen
 function displayGameOver() {
     context.fillStyle = "white";
     context.font = "15px 'Gloria Hallelujah', cursive";
@@ -337,7 +340,7 @@ function displayGameOver() {
 
 
 
-
+/// function reset game
 function resetGame() {
     doodler = {
         img: doodlerRightImg,
@@ -361,7 +364,7 @@ function resetGame() {
 
 
 
-//// functions of stars side
+//// functions of stars (background)
 
 function generateStars() {
     for (let i = 0; i < numStars; i++) {
